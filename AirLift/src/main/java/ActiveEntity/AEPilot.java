@@ -34,6 +34,4 @@ public class AEPilot extends Thread{
                 notEnd = false;
         }
     }
-    
-    
 }
