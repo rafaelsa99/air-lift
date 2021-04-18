@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package Main;
+
+package Repository;
+import Common.Parameters;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  *
@@ -18,8 +16,8 @@ public class Repository {
                                            "P05", "P06", "P07","P08", "P09", "P10", "P11", 
                                            "P12", "P13", "P14", "P15", "P16", "P17", "P18", 
                                            "P19", "P20", "InQ", "InF", "PTAL"};
-    private File logg;
-    private PrintWriter pw;
+    private File logFile;
+    private FileWriter writer;
     
     // Passenger
     //private States[] passangerState;
@@ -34,9 +32,12 @@ public class Repository {
     // Departure Airport
     private int customerQueue;
     private int waitingForBoarding;
-    // Repository Construsct
-    public Repository() throws FileNotFoundException{
-        logg = new File(AirLift.filename);
-        pw = new PrintWriter(logg);
+
+    public Repository() throws IOException{
+        logFile = new File(Parameters.LOG_FILENAME);
+        writer = new FileWriter(logFile);
+        for (int i = 0; i < stateAbrev.length; i++)
+            writer.write(stateAbrev[i] + " ");
+        writer.write("\n");
     }
 }

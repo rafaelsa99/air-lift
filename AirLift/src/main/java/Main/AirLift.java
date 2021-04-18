@@ -4,6 +4,7 @@ package Main;
 import ActiveEntity.AEHostess;
 import ActiveEntity.AEPassenger;
 import ActiveEntity.AEPilot;
+import Common.Parameters;
 import DepartureAirport.IDepartureAirport_Hostess;
 import DepartureAirport.IDepartureAirport_Passenger;
 import DepartureAirport.IDepartureAirport_Pilot;
@@ -14,6 +15,10 @@ import Plane.IPlane_Hostess;
 import Plane.IPlane_Passenger;
 import Plane.IPlane_Pilot;
 import Plane.SRPlane;
+import Repository.Repository;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,9 +26,9 @@ import Plane.SRPlane;
  */
 public class AirLift {
 
-    private int NUM_PASSENGER;
-    private int MAX_PASSENGER;
-    private int MIN_PASSENGER;
+    private int numPassenger;
+    private int maxPassenger;
+    private int minPassenger;
     
     private SRDepartureAirport srDepartureAirport;
     private SRPlane srPlane;
@@ -33,14 +38,18 @@ public class AirLift {
     private AEHostess aeHostess;
     private AEPassenger[] aePassenger;
     
-    public AirLift(String[] args) {
-        NUM_PASSENGER = 21; //or from args
-        MAX_PASSENGER = 10; //or from args
-        MIN_PASSENGER = 5; //or from args
+    private Repository repository;
+    
+    public AirLift(String[] args) throws IOException {
+        numPassenger = Parameters.NUM_PASSENGER; //or from args
+        maxPassenger = Parameters.MAX_PASSENGER; //or from args
+        minPassenger = Parameters.MIN_PASSENGER; //or from args
+        
+        repository = new Repository();
         
         //Shared regions instatiation
-        srDepartureAirport = new SRDepartureAirport();
-        srPlane = new SRPlane();
+        srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger);
+        srPlane = new SRPlane(numPassenger);
         srDestinationAirport = new SRDestinationAirport();
         
         //Active entities instatiation (threads)
@@ -48,12 +57,12 @@ public class AirLift {
                               (IPlane_Pilot)srPlane);
         aeHostess = new AEHostess((IDepartureAirport_Hostess)srDepartureAirport,
                                   (IPlane_Hostess)srPlane);
-        aePassenger = new AEPassenger[NUM_PASSENGER];
+        aePassenger = new AEPassenger[numPassenger];
         
-        for (int i = 0; i < NUM_PASSENGER; i++) {
+        for (int i = 0; i < numPassenger; i++) {
             aePassenger[i] = new AEPassenger((IDepartureAirport_Passenger)srDepartureAirport,
-                                             (IPlane_Passenger)srPlane,
-                                             (IDestinationAirport_Passenger)srDestinationAirport);
+                                             (IDestinationAirport_Passenger)srDestinationAirport,
+                                             (IPlane_Passenger)srPlane, i);
         }
         
         //...
@@ -65,14 +74,14 @@ public class AirLift {
         //Start active entities (threads)
         aePilot.start();
         aeHostess.start();
-        for (int i = 0; i < MAX_PASSENGER; i++) 
+        for (int i = 0; i < numPassenger; i++) 
             aePassenger[i].start();
         
         //Wait active entities to die
         try{
             aePilot.join();
             aeHostess.join();
-            for (int i = 0; i < MAX_PASSENGER; i++) 
+            for (int i = 0; i < numPassenger; i++) 
                 aePassenger[i].join();
         }catch(Exception ex){
             //...
@@ -82,6 +91,10 @@ public class AirLift {
     }
     
     public static void main(String[] args) {
-        new AirLift(args).startSimulation();
+        try {
+            new AirLift(args).startSimulation();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

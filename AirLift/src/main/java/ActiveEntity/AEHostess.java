@@ -1,44 +1,43 @@
 
 package ActiveEntity;
 
+import Common.STHostess;
 import DepartureAirport.IDepartureAirport_Hostess;
 import Plane.IPlane_Hostess;
-import DestinationAirport.IDestinationAiport_Hostess;
 /**
  *
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AEHostess extends Thread{
     
-    private final IDepartureAirport_Hostess hDepartureAirport;
-    private final IDestinationAiport_Hostess hDestinationAirport;
-    private final IPlane_Hostess hPlane;
+    private final IDepartureAirport_Hostess iDepartureAirport;
+    private final IPlane_Hostess iPlane;
+    private STHostess stHostess;
     
     /**
      * Hostess instantiation
      * 
      */
-    public AEHostess(IDepartureAirport_Hostess hDepartureAirport_hostess,
-                    IDestinationAiport_Hostess hDestinationAirport_hostess,
-                    IPlane_Hostess hPlane_Hostess ) {
-		super("Hostess ");
-                hDepartureAirport = hDepartureAirport_hostess;
-                hDestinationAirport = hDestinationAirport_hostess;
-                hPlane = hPlane_Hostess;
+    public AEHostess(IDepartureAirport_Hostess iDepartureAirport_Hostess,
+                     IPlane_Hostess iPlane_Hostess ) {
+        super("Hostess");
+        iDepartureAirport = iDepartureAirport_Hostess;
+        iPlane = iPlane_Hostess;
     }
     public void run(){
-        while(hPlane_Hostess.waitForAllInBoard()!= 0){
-            if(hDepartureAirport_hostess.waitForNextFlight() == 0){
-                break;
+        while(true){
+            stHostess = iDepartureAirport.waitForNextFlight();
+            System.out.println("HOSTESS: " + stHostess);
+            stHostess = iDepartureAirport.prepareForPassBoarding();
+            System.out.println("HOSTESS: " + stHostess);
+            while(stHostess != STHostess.RDTF){
+                stHostess = iDepartureAirport.checkDocuments();
+                System.out.println("HOSTESS: " + stHostess);
+                stHostess = iDepartureAirport.waitForNextPassenger();
+                System.out.println("HOSTESS: " + stHostess);
             }
-            hDepartureAirport_hostess.prepareForPassBoarding()();
-            while(passangersInqueue && spaceAvailableOnPlane){
-                hDepartureAirport_hostess.checkDocuments();
-                hDepartureAirport_hostess.waitForNextPassenger();
-            }
-            hPlane_Hostess.informPlaneReadyToTakeOff();
-            
-            
+            stHostess = iPlane.informPlaneReadyToTakeOff();
+            System.out.println("HOSTESS: " + stHostess);
         }
     }
     

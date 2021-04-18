@@ -1,6 +1,7 @@
 
 package ActiveEntity;
 
+import Common.STPilot;
 import DepartureAirport.IDepartureAirport_Pilot;
 import Plane.IPlane_Pilot;
 
@@ -13,25 +14,31 @@ public class AEPilot extends Thread{
     //Shared Regions
     private final IDepartureAirport_Pilot iDepartureAirport;
     private final IPlane_Pilot iPlane;
-
+    private STPilot stPilot;
+    
     public AEPilot(IDepartureAirport_Pilot iDepartureAirport, IPlane_Pilot iPlane) {
+        super("Pilot");
         this.iDepartureAirport = iDepartureAirport;
         this.iPlane = iPlane;
     }
 
     @Override
-    public void run() {
-        Boolean notEnd = true;
-        
-        while(notEnd){
-            iDepartureAirport.informPlaneReadyForBoarding();
-            iPlane.waitForAllInBoard();
-            iPlane.flyToDestinationPoint();
-            iPlane.announceArrival();
-            iPlane.flyToDeparturePoint();
-            iPlane.parkAtTransferGate();
-            if(iDepartureAirport.allPassengersTransported())
-                notEnd = false;
+    public void run() {   
+        while(true){
+            stPilot = iDepartureAirport.informPlaneReadyForBoarding();
+            System.out.println("PILOT: " + stPilot);
+            stPilot = iPlane.waitForAllInBoard();
+            System.out.println("PILOT: " + stPilot);
+            stPilot = iPlane.flyToDestinationPoint();
+            System.out.println("PILOT: " + stPilot);
+            stPilot = iPlane.announceArrival();
+            System.out.println("PILOT: " + stPilot);
+            stPilot = iPlane.flyToDeparturePoint();
+            System.out.println("PILOT: " + stPilot);
+            stPilot = iPlane.parkAtTransferGate();
+            System.out.println("PILOT: " + stPilot);
+            //if(iDepartureAirport.allPassengersTransported())
+                //return;
         }
     }
 }
