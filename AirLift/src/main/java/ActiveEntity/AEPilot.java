@@ -25,20 +25,13 @@ public class AEPilot extends Thread{
     @Override
     public void run() {   
         while(true){
-            stPilot = iDepartureAirport.informPlaneReadyForBoarding();
-            System.out.println("PILOT: " + stPilot);
-            stPilot = iPlane.waitForAllInBoard();
-            System.out.println("PILOT: " + stPilot);
-            stPilot = iPlane.flyToDestinationPoint();
-            System.out.println("PILOT: " + stPilot);
-            stPilot = iPlane.announceArrival();
-            System.out.println("PILOT: " + stPilot);
-            stPilot = iPlane.flyToDeparturePoint();
-            System.out.println("PILOT: " + stPilot);
-            stPilot = iPlane.parkAtTransferGate();
-            System.out.println("PILOT: " + stPilot);
-            //if(iDepartureAirport.allPassengersTransported())
-                //return;
+            if(!iDepartureAirport.informPlaneReadyForBoarding())
+                break;
+            iPlane.waitForAllInBoard();
+            iPlane.flyToDestinationPoint();
+            iPlane.announceArrival();
+            iPlane.flyToDeparturePoint();
+            iPlane.parkAtTransferGate();
         }
     }
 }

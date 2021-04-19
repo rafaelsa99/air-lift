@@ -15,10 +15,11 @@ import Plane.IPlane_Hostess;
 import Plane.IPlane_Passenger;
 import Plane.IPlane_Pilot;
 import Plane.SRPlane;
+import Repository.IRepository_DepartureAirport;
+import Repository.IRepository_DestinationAirport;
+import Repository.IRepository_Plane;
 import Repository.Repository;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -29,6 +30,7 @@ public class AirLift {
     private int numPassenger;
     private int maxPassenger;
     private int minPassenger;
+    private int maxSleep;
     
     private SRDepartureAirport srDepartureAirport;
     private SRPlane srPlane;
@@ -44,13 +46,16 @@ public class AirLift {
         numPassenger = Parameters.NUM_PASSENGER; //or from args
         maxPassenger = Parameters.MAX_PASSENGER; //or from args
         minPassenger = Parameters.MIN_PASSENGER; //or from args
+        maxSleep = Parameters.MAX_SLEEP; //or from args
         
-        repository = new Repository();
+        repository = new Repository(numPassenger);
         
         //Shared regions instatiation
-        srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger);
-        srPlane = new SRPlane(numPassenger);
-        srDestinationAirport = new SRDestinationAirport();
+        srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger,
+                                                    (IRepository_DepartureAirport) repository,
+                                                    maxSleep);
+        srPlane = new SRPlane(numPassenger, (IRepository_Plane) repository, maxSleep);
+        srDestinationAirport = new SRDestinationAirport((IRepository_DestinationAirport) repository);
         
         //Active entities instatiation (threads)
         aePilot = new AEPilot((IDepartureAirport_Pilot)srDepartureAirport,
@@ -84,10 +89,11 @@ public class AirLift {
             for (int i = 0; i < numPassenger; i++) 
                 aePassenger[i].join();
         }catch(Exception ex){
-            //...
+            System.out.println(ex.getMessage());
         }
         
         System.out.println("End of Simulation!");
+        System.out.println("Logs written to the file \"" + Parameters.LOG_FILENAME + "\"");
     }
     
     public static void main(String[] args) {

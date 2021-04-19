@@ -46,17 +46,12 @@ public class AEPassenger extends Thread{
     }
     
     public void run(){
-        stPassenger = iDepartureAirport.travelToAirport(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
-        stPassenger = iDepartureAirport.waitInQueue(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
-        stPassenger = iDepartureAirport.showDocuments(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
-        stPassenger = iPlane.boardThePlane(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
-        stPassenger = iPlane.waitForEndOfFlight(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
-        stPassenger = iDestinationAirport.leaveThePlane(id);
-        System.out.println("PASSENGER " + id + ": " + stPassenger);
+        iDepartureAirport.travelToAirport(id);
+        iDepartureAirport.waitInQueue(id);
+        iDepartureAirport.showDocuments(id);
+        iPlane.boardThePlane(id);
+        iPlane.waitForEndOfFlight(id);
+        iDestinationAirport.leaveThePlane(id);
+        iPlane.leaveThePlane(id);
     }
 }

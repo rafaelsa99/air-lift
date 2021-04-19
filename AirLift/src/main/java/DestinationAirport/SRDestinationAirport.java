@@ -2,6 +2,7 @@
 package DestinationAirport;
 
 import Common.STPassenger;
+import Repository.IRepository_DestinationAirport;
 
 /**
  *
@@ -9,9 +10,15 @@ import Common.STPassenger;
  */
 public class SRDestinationAirport implements IDestinationAirport_Passenger{
 
+    private final IRepository_DestinationAirport iRepository;
+
+    public SRDestinationAirport(IRepository_DestinationAirport iRepository) {
+        this.iRepository = iRepository;
+    }
+    
     @Override
-    public STPassenger leaveThePlane(int passengerID) {
-        return STPassenger.ATDS;
+    public void leaveThePlane(int passengerID) {
+        iRepository.setPassengerState(STPassenger.ATDS, passengerID);
     }
     
 }

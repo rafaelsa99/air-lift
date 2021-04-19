@@ -26,18 +26,14 @@ public class AEHostess extends Thread{
     }
     public void run(){
         while(true){
-            stHostess = iDepartureAirport.waitForNextFlight();
-            System.out.println("HOSTESS: " + stHostess);
-            stHostess = iDepartureAirport.prepareForPassBoarding();
-            System.out.println("HOSTESS: " + stHostess);
-            while(stHostess != STHostess.RDTF){
-                stHostess = iDepartureAirport.checkDocuments();
-                System.out.println("HOSTESS: " + stHostess);
+            if(!iDepartureAirport.waitForNextFlight())
+                break;
+            iDepartureAirport.prepareForPassBoarding();
+            do{
+                iDepartureAirport.checkDocuments();
                 stHostess = iDepartureAirport.waitForNextPassenger();
-                System.out.println("HOSTESS: " + stHostess);
-            }
-            stHostess = iPlane.informPlaneReadyToTakeOff();
-            System.out.println("HOSTESS: " + stHostess);
+            }while(stHostess != STHostess.RDTF);
+            iPlane.informPlaneReadyToTakeOff();
         }
     }
     

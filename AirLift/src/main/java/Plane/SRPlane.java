@@ -4,9 +4,9 @@ package Plane;
 import Common.STHostess;
 import Common.STPassenger;
 import Common.STPilot;
-import static java.lang.Thread.sleep;
-import java.util.LinkedList;
-import java.util.Random;
+import Repository.IRepository_Plane;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,30 +18,35 @@ public class SRPlane implements IPlane_Pilot,
                                 IPlane_Hostess, 
                                 IPlane_Passenger{
 
+    private final IRepository_Plane iRepository;
     private final ReentrantLock rl;
     private final Condition takeOff;
-    private final Condition passengerLeaving;
+    private final Condition deboarding;
     private final Condition[] flight;
     private boolean readyTakeOff;
-    private final LinkedList<Integer> passengersOnPlane;
-    private int passengerToLeave;
+    private final List<Integer> passengersOnPlane;
+    private boolean endOfFlight;
+    private final int maxSleep;
     
-    public SRPlane(int numPassengers) {
+    public SRPlane(int numPassengers, IRepository_Plane iRepository, int maxSleep) {
+        this.iRepository = iRepository;
         rl = new ReentrantLock(true);
         takeOff = rl.newCondition();
-        passengerLeaving = rl.newCondition();
+        deboarding = rl.newCondition();
         flight = new Condition[numPassengers];
         for (int i = 0; i < numPassengers; i++)
             flight[i] = rl.newCondition();
         readyTakeOff = false;
-        passengersOnPlane = new LinkedList<>();
-        passengerToLeave = -1;
+        passengersOnPlane = new ArrayList<>();
+        endOfFlight = false;
+        this.maxSleep = maxSleep;
     }
     
     @Override
-    public STPilot waitForAllInBoard() {
+    public void waitForAllInBoard() {
         try{
             rl.lock();
+            iRepository.setPilotState(STPilot.WTFB);
             while(!readyTakeOff)
                 takeOff.await();
             readyTakeOff = false;
@@ -49,84 +54,94 @@ public class SRPlane implements IPlane_Pilot,
         finally{
             rl.unlock();
         }
-        return STPilot.FLFW;
     }
 
     @Override
-    public STPilot flyToDestinationPoint() {
+    public void flyToDestinationPoint() {
+        iRepository.setPilotState(STPilot.FLFW);
         try {
-            sleep((long) (new Random().nextInt(100))); //VERIFICAR TEMPO DO SLEEP
+            Thread.sleep((long)(Math.random() * maxSleep));
 	} catch (InterruptedException e) {}
-        return STPilot.DRPP;
     }
 
     @Override
-    public STPilot announceArrival() {
+    public void announceArrival() {
         try{
             rl.lock();
-            while(!passengersOnPlane.isEmpty()){
-                passengerToLeave = passengersOnPlane.removeLast();
-                flight[passengerToLeave].signal();
-                while(passengerToLeave != -1)
-                    passengerLeaving.await();
-            }
+            iRepository.setPilotState(STPilot.DRPP);
+            endOfFlight = true;
+            for (int i = 0; i < flight.length; i++) 
+                flight[i].signal();
+            while(!passengersOnPlane.isEmpty())
+                deboarding.await();
+            endOfFlight = false;
         } catch(Exception ex){}
         finally{
             rl.unlock();
         }
-        return STPilot.FLBK;
     }
 
     @Override
-    public STPilot flyToDeparturePoint() {
+    public void flyToDeparturePoint() {
+        iRepository.setPilotState(STPilot.FLBK);
         try {
-            sleep((long) (new Random().nextInt(100))); //VERIFICAR TEMPO DO SLEEP
+            Thread.sleep((long)(Math.random() * maxSleep));
 	} catch (InterruptedException e) {}
-        return STPilot.ATRG;
     }
 
     @Override
-    public STPilot parkAtTransferGate() {
-        return STPilot.RDFB;
+    public void parkAtTransferGate() {
+        iRepository.setPilotState(STPilot.ATRG);
     }
 
     @Override
-    public STHostess informPlaneReadyToTakeOff() {
+    public void informPlaneReadyToTakeOff() {
         try{
             rl.lock();
+            iRepository.setHostessState(STHostess.RDTF);
             readyTakeOff = true;
             takeOff.signal();
         } catch(Exception ex){}
         finally{
             rl.unlock();
         }
-        return STHostess.WTFL;
     }
 
     @Override
-    public STPassenger boardThePlane(int passengerID) {
+    public void boardThePlane(int passengerID) {
         try{
             rl.lock();
+            iRepository.setPassengerState(STPassenger.INFL, passengerID);
             passengersOnPlane.add(passengerID);
         } catch(Exception ex){}
         finally{
             rl.unlock();
         }
-        return STPassenger.INFL;
     }
 
     @Override
-    public STPassenger waitForEndOfFlight(int passengerID) {
+    public void waitForEndOfFlight(int passengerID) {
         try{
             rl.lock();
-            while(passengerToLeave != passengerID)
+            while(!endOfFlight)
                 flight[passengerID].await();
-            passengerToLeave = -1;
-            passengerLeaving.signal();
+        } catch(Exception ex){}
+        finally{
+            rl.unlock();
+            
+        }
+    }
+
+    @Override
+    public void leaveThePlane(int passengerID) {
+        try{
+            rl.lock();
+            passengersOnPlane.remove(Integer.valueOf(passengerID));
+            if(passengersOnPlane.isEmpty())
+                deboarding.signal();
         } catch(Exception ex){}
         finally{
             rl.unlock();
         }
-        return STPassenger.ATDS;
     }
 }
