@@ -18,16 +18,67 @@ public class SRPlane implements IPlane_Pilot,
                                 IPlane_Hostess, 
                                 IPlane_Passenger{
 
+    /**
+     * Repository
+     * @serialfield iRepository
+     */
     private final IRepository_Plane iRepository;
+    /**
+     * Lock instantiation
+     * @serialfield rl
+     */
     private final ReentrantLock rl;
+    /**
+     * Contition variable
+     * sender: Pilot
+     * receiver: 
+     * @serialfield takeOff
+     */
     private final Condition takeOff;
+    /**
+     * Condition variable
+     * Sender: Pilot signals 
+     * Receiver: 
+     * @serialfield deboarding
+     */
     private final Condition deboarding;
+    /**
+     * Condition variable
+     * Sender: 
+     * Receiver: 
+     * @serialfield flight
+     */
     private final Condition[] flight;
+    /**
+     * bolean variable
+     * true if plane is ready to takeoff
+     * @serialfield readyTakeOff
+     */
     private boolean readyTakeOff;
+    /**
+     * Array list
+     * Number of passengers in the plane
+     * @serialfield passengersOnPlane
+     */
     private final List<Integer> passengersOnPlane;
+    /**
+     * bolean variable
+     * True if flight has ended (arrived at departue airport)
+     * @serialfield endOfFlight
+     */
     private boolean endOfFlight;
+    /**
+     * 
+     * @serialfield maxSleep
+     */
     private final int maxSleep;
     
+    /**
+     * SR Plane instatiation
+     * @param numPassengers
+     * @param iRepository
+     * @param maxSleep 
+     */
     public SRPlane(int numPassengers, IRepository_Plane iRepository, int maxSleep) {
         this.iRepository = iRepository;
         rl = new ReentrantLock(true);
@@ -42,6 +93,9 @@ public class SRPlane implements IPlane_Pilot,
         this.maxSleep = maxSleep;
     }
     
+    /**
+     * waits for passengers to get on board
+     */
     @Override
     public void waitForAllInBoard() {
         try{
@@ -56,6 +110,9 @@ public class SRPlane implements IPlane_Pilot,
         }
     }
 
+    /**
+     * Random value to simualte passenger going to airport
+     */
     @Override
     public void flyToDestinationPoint() {
         iRepository.setPilotState(STPilot.FLFW);
@@ -64,6 +121,9 @@ public class SRPlane implements IPlane_Pilot,
 	} catch (InterruptedException e) {}
     }
 
+    /**
+     * Pilot anounces the flight has arrived
+     */
     @Override
     public void announceArrival() {
         try{
@@ -81,6 +141,9 @@ public class SRPlane implements IPlane_Pilot,
         }
     }
 
+    /**
+     * Random time simulating the plane traveling to departure airport
+     */
     @Override
     public void flyToDeparturePoint() {
         iRepository.setPilotState(STPilot.FLBK);
@@ -89,11 +152,17 @@ public class SRPlane implements IPlane_Pilot,
 	} catch (InterruptedException e) {}
     }
 
+    /**
+     * Sets state of pilot when the plane arrives at transfer gate
+     */
     @Override
     public void parkAtTransferGate() {
         iRepository.setPilotState(STPilot.ATRG);
     }
 
+    /**
+     * Hostess anounces the plane is ready to takeoff
+     */
     @Override
     public void informPlaneReadyToTakeOff() {
         try{
@@ -107,6 +176,11 @@ public class SRPlane implements IPlane_Pilot,
         }
     }
 
+    /**
+     * Passenger with id passengerID boards the plane and its added to the list of
+     * passengers in the plane
+     * @param passengerID 
+     */
     @Override
     public void boardThePlane(int passengerID) {
         try{
@@ -119,6 +193,10 @@ public class SRPlane implements IPlane_Pilot,
         }
     }
 
+    /**
+     * Passenger waits until the flight has arrived at the destination airport
+     * @param passengerID 
+     */
     @Override
     public void waitForEndOfFlight(int passengerID) {
         try{
@@ -132,6 +210,10 @@ public class SRPlane implements IPlane_Pilot,
         }
     }
 
+    /**
+     * Passengers leave the plane
+     * @param passengerID 
+     */
     @Override
     public void leaveThePlane(int passengerID) {
         try{

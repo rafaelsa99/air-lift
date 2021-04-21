@@ -12,16 +12,36 @@ import Plane.IPlane_Pilot;
 public class AEPilot extends Thread{
     
     //Shared Regions
+    /**
+     * iDepartureAirport shared region for Pilot
+     * @serialField iDepartureAirport
+     */
     private final IDepartureAirport_Pilot iDepartureAirport;
+    /**
+     * iPlane shared region for Pilot
+     * @serialField iPlane
+     */
     private final IPlane_Pilot iPlane;
+    /**
+     * 
+     */
     private STPilot stPilot;
     
+    /**
+     * Pilot Instantiation
+     * @param iDepartureAirport
+     * @param iPlane 
+     */
     public AEPilot(IDepartureAirport_Pilot iDepartureAirport, IPlane_Pilot iPlane) {
         super("Pilot");
         this.iDepartureAirport = iDepartureAirport;
         this.iPlane = iPlane;
     }
 
+    /**
+     * Pilot's lifecycle
+     * 
+     */
     @Override
     public void run() {   
         while(true){

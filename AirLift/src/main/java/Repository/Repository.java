@@ -21,23 +21,77 @@ public class Repository implements IRepository_DepartureAirport,
                                    IRepository_Plane,
                                    IRepository_DestinationAirport{
     // States abr
+    /**
+     * States abreviation
+     * @serialfield stateAbrev
+     */
     private final String [] stateAbrev ={"PT", "HT", "P", "InQ", "InF", "PTAL"};
+    /**
+     * Lock instantiation
+     * @serialfield rl
+     */
     private final ReentrantLock rl;
+    /**
+     * Name of log file
+     * @serialfield logFile
+     */
     private final File logFile;
+    /**
+     * File writer instatiation
+     * @serialfield writer
+     */
     private final FileWriter writer;
     
+    
     // States
+    /**
+     * Passenger's state
+     * @serialfield passangerState
+     */
     private final STPassenger[] passangerState;
+    /**
+     * Pilot's state
+     * @serialfield pilotState
+     */
     private STPilot pilotState;
+    /**
+     * Hostess's state
+     * @serialfield hostessState
+     */
     private STHostess hostessState;
     
+    /**
+     * Number of passengers in queue to show documents
+     * @serialfield passengersInQueue
+     */
     private int passengersInQueue;
+    /**
+     * Number of passengers inside the plane
+     * @serialfield passengersInPlane
+     */
     private int passengersInPlane;
+    /**
+     * Number of passengers that arrived at the destination
+     * @serialfield passengersAtDestination
+     */
     private int passengersAtDestination;
     
+    /**
+     * Number of current flight
+     * @serialfield flightNumber
+     */
     private int flightNumber;
+    /**
+     * List with all flights completed
+     * @serialfield flights
+     */
     private final LinkedHashMap<Integer, Integer> flights;
 
+    /**
+     * Repository instantiation
+     * @param numPassengers
+     * @throws IOException 
+     */
     public Repository(int numPassengers) throws IOException{
         rl = new ReentrantLock(true);
         pilotState = STPilot.ATRG;
@@ -55,6 +109,11 @@ public class Repository implements IRepository_DepartureAirport,
         initializeLogFile(numPassengers);
     }
 
+    /**
+     * Initializes Log file
+     * @param numPassengers
+     * @throws IOException 
+     */
     private void initializeLogFile(int numPassengers) throws IOException{
         for (int i = 0; i < stateAbrev.length; i++){
             switch(stateAbrev[i]){
@@ -77,6 +136,9 @@ public class Repository implements IRepository_DepartureAirport,
         printStates();
     }
     
+    /**
+     * Prints to log file number of passengers in specific flight
+     */
     @Override
     public void printSumUp(){
         try {
@@ -93,6 +155,10 @@ public class Repository implements IRepository_DepartureAirport,
         }
     }
     
+    /**
+     * Prints to log file current states of entities
+     * @throws IOException 
+     */
     private void printStates() throws IOException{
         writer.write(pilotState + " " + hostessState);
         for (int i = 0; i < passangerState.length; i++)
@@ -110,6 +176,10 @@ public class Repository implements IRepository_DepartureAirport,
         writer.write("\n");
     }
     
+    /**
+     * Sets Pilot state
+     * @param stPilot 
+     */
     @Override
     public void setPilotState(STPilot stPilot) {
         try {
@@ -134,6 +204,10 @@ public class Repository implements IRepository_DepartureAirport,
         }
     }
 
+    /**
+     * Sets Hostess state
+     * @param stHostess 
+     */
     @Override
     public void setHostessState(STHostess stHostess) {
         try {
@@ -153,6 +227,11 @@ public class Repository implements IRepository_DepartureAirport,
         }
     }
 
+    /**
+     * Sets Hostess state
+     * @param stHostess
+     * @param passengerID 
+     */
     @Override
     public void setHostessState(STHostess stHostess, int passengerID) {
         try {
@@ -170,6 +249,11 @@ public class Repository implements IRepository_DepartureAirport,
         }
     }
     
+    /**
+     * Sets passenger State
+     * @param stPassenger
+     * @param passengerID 
+     */
     @Override
     public void setPassengerState(STPassenger stPassenger, int passengerID) {
         try {

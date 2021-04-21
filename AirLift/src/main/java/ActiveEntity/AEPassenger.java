@@ -12,9 +12,26 @@ import java.util.*;
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AEPassenger extends Thread{
+    
+    /**
+     * iDepartureAirport
+     * @serialField IDepartureAirport_Passenger
+     */
     private final IDepartureAirport_Passenger iDepartureAirport;
+    /**
+     * iDestinationAirport
+     * @serialField IDestinationAirport_Passenger
+     */
     private final IDestinationAirport_Passenger iDestinationAirport;
+    /**
+     * Plane
+     * @serialField IPlane_Passenger
+     */
     private final IPlane_Passenger iPlane;
+    /**
+     * Passenger states
+     * @serialField STPassenger
+     */
     private STPassenger stPassenger;
     
     /**
@@ -25,7 +42,10 @@ public class AEPassenger extends Thread{
     /**
      * Passenger instantiation
      * 
-     * @param id Passenger's Id
+     * @param pDepartureAirport_passenger   Departure Airport shared region  
+     * @param pDestinationAirport_passenger Destination Airport shared region  
+     * @param pPlane_passenger              Plane shared region              
+     * @param id                            Passenger's Id 
      */
     public AEPassenger(IDepartureAirport_Passenger pDepartureAirport_passenger,
                        IDestinationAirport_Passenger pDestinationAirport_passenger,
@@ -44,7 +64,9 @@ public class AEPassenger extends Thread{
     public int getPassengerID() {
             return id;
     }
-    
+    /**
+     * Passenger's lifecycle
+     */
     public void run(){
         iDepartureAirport.travelToAirport(id);
         iDepartureAirport.waitInQueue(id);

@@ -27,21 +27,69 @@ import java.io.IOException;
  */
 public class AirLift {
 
+    /**
+     * Number of passengers
+     * @serialfield numPassenger
+     */
     private int numPassenger;
+    /**
+     * Maximum mumber of passengers in a flight
+     * @serialfield maxPassenger
+     */
     private int maxPassenger;
+    /**
+     * Minimum number of passengers in a flight
+     * @serialfield minPassenger
+     */
     private int minPassenger;
+    /**
+     * @serialfield maxSleep
+     */
     private int maxSleep;
     
+    /**
+     * SRDepartureAirport
+     * @serialfield srDepartureAirport
+     */
     private SRDepartureAirport srDepartureAirport;
+    /**
+     * srPlane
+     * @serialfield srPlane
+     */
     private SRPlane srPlane;
+    /**
+     * SRDestinationAirport
+     * @serialfield srDestinationAirport
+     */
     private SRDestinationAirport srDestinationAirport;
     
+    /**
+     * Pilot state
+     * @serialfield aePilot
+     */
     private AEPilot aePilot;
+    /**
+     * Hostess state
+     * @serialfield aeHostess
+     */
     private AEHostess aeHostess;
+    /**
+     * Passenger state
+     * @serialfield aePassenger
+     */
     private AEPassenger[] aePassenger;
     
+    /**
+     * Repository
+     * @serialfield repository
+     */
     private Repository repository;
     
+    /**
+     * Airlift Instantiation
+     * @param args
+     * @throws IOException 
+     */
     public AirLift(String[] args) throws IOException {
         numPassenger = Parameters.NUM_PASSENGER; //or from args
         maxPassenger = Parameters.MAX_PASSENGER; //or from args
@@ -73,6 +121,9 @@ public class AirLift {
         //...
     }
     
+    /**
+     * Function to start the program
+     */
     private void startSimulation(){
         System.out.println("Simulation Started!");
         
@@ -96,6 +147,10 @@ public class AirLift {
         System.out.println("Logs written to the file \"" + Parameters.LOG_FILENAME + "\"");
     }
     
+    /**
+     * Main fuction
+     * @param args 
+     */
     public static void main(String[] args) {
         try {
             new AirLift(args).startSimulation();
