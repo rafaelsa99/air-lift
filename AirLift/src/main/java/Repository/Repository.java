@@ -1,17 +1,14 @@
 
 package Repository;
-import Common.Parameters;
-import Common.STHostess;
-import Common.STPassenger;
-import Common.STPilot;
+import ActiveEntity.HostessStates;
+import ActiveEntity.PassengerStates;
+import ActiveEntity.PilotStates;
+import Common.MemException;
+import Common.MemFIFO;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -21,6 +18,7 @@ public class Repository implements IRepository_DepartureAirport,
                                    IRepository_Plane,
                                    IRepository_DestinationAirport{
     // States abr
+<<<<<<< HEAD
     /**
      * States abreviation
      * @serialfield stateAbrev
@@ -30,6 +28,9 @@ public class Repository implements IRepository_DepartureAirport,
      * Lock instantiation
      * @serialfield rl
      */
+=======
+    private static final String [] stateAbrev ={"PT", "HT", "P", "InQ", "InF", "PTAL"};
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     private final ReentrantLock rl;
     /**
      * Name of log file
@@ -41,6 +42,7 @@ public class Repository implements IRepository_DepartureAirport,
      * @serialfield writer
      */
     private final FileWriter writer;
+<<<<<<< HEAD
     
     
     // States
@@ -59,6 +61,14 @@ public class Repository implements IRepository_DepartureAirport,
      * @serialfield hostessState
      */
     private STHostess hostessState;
+=======
+    private String line;
+
+    // States
+    private final int[] passangerState;
+    private int pilotState;
+    private int hostessState;
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * Number of passengers in queue to show documents
@@ -81,6 +91,7 @@ public class Repository implements IRepository_DepartureAirport,
      * @serialfield flightNumber
      */
     private int flightNumber;
+<<<<<<< HEAD
     /**
      * List with all flights completed
      * @serialfield flights
@@ -93,18 +104,23 @@ public class Repository implements IRepository_DepartureAirport,
      * @throws IOException 
      */
     public Repository(int numPassengers) throws IOException{
+=======
+    private MemFIFO<Integer> flights;
+
+    public Repository(int numPassengers, String logFilename) throws IOException, MemException{
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
         rl = new ReentrantLock(true);
-        pilotState = STPilot.ATRG;
-        hostessState = STHostess.WTFL;
-        passangerState = new STPassenger[numPassengers];
+        pilotState = PilotStates.ATRG;
+        hostessState = HostessStates.WTFL;
+        passangerState = new int[numPassengers];
         for (int i = 0; i < numPassengers; i++)
-            passangerState[i] = STPassenger.GTAP;
+            passangerState[i] = PassengerStates.GTAP;
         passengersInQueue = 0;
         passengersInPlane = 0;
         passengersAtDestination = 0;
         flightNumber = 0;
-        flights = new LinkedHashMap<>();
-        logFile = new File(Parameters.LOG_FILENAME);
+        flights = new MemFIFO<>(numPassengers);
+        logFile = new File(logFilename);
         writer = new FileWriter(logFile);
         initializeLogFile(numPassengers);
     }
@@ -115,24 +131,26 @@ public class Repository implements IRepository_DepartureAirport,
      * @throws IOException 
      */
     private void initializeLogFile(int numPassengers) throws IOException{
+        line = "";
         for (int i = 0; i < stateAbrev.length; i++){
             switch(stateAbrev[i]){
                 case "P":
                     for (int j = 0; j < numPassengers; j++)
-                        writer.write(" " + stateAbrev[i] + String.format("%02d", j) + " ");
+                        line += " " + stateAbrev[i] + String.format("%02d", j) + " ";
                     break;
                 case "PT":
                 case "HT":
-                    writer.write(" " + stateAbrev[i] + "  ");
+                    line += " " + stateAbrev[i] + "  ";
                     break;
                 case "InQ":
                 case "InF":
                 case "PTAL":
-                    writer.write(stateAbrev[i] + " ");
+                    line += stateAbrev[i] + " ";
                     break;
             }
         }
-        writer.write("\n");
+        line += "\n";
+        writer.write(line);
         printStates();
     }
     
@@ -143,11 +161,17 @@ public class Repository implements IRepository_DepartureAirport,
     public void printSumUp(){
         try {
             rl.lock();
-            writer.write("\nAirlift sum up:");
-            for (Map.Entry<Integer,Integer> flight : flights.entrySet())
-                writer.write("\nFlight " + flight.getKey() + 
-                        " transported " + flight.getValue() + " passengers");
-            writer.write(".");
+            line = "";
+            int count = 0;
+            line += "\nAirlift sum up:";
+            while(!flights.empty()){
+                try{
+                    line += "\nFlight " + (++count) + 
+                                " transported " + flights.read() + " passengers";
+                } catch(MemException ex) {}
+            }
+            line += ".";
+            writer.write(line);
             writer.close();
         } catch (IOException ex) {}
         finally {
@@ -160,9 +184,11 @@ public class Repository implements IRepository_DepartureAirport,
      * @throws IOException 
      */
     private void printStates() throws IOException{
-        writer.write(pilotState + " " + hostessState);
+        line = "";
+        printPilotState();
+        printHostessState();
         for (int i = 0; i < passangerState.length; i++)
-            writer.write(" " + passangerState[i]);
+            printPassengerState(i);
         int[] counters = {passengersInQueue, passengersInPlane, passengersAtDestination};
         int counterLength;
         String spacesFormat;
@@ -171,9 +197,53 @@ public class Repository implements IRepository_DepartureAirport,
             spacesFormat = "   ";
             if(counterLength == 2) 
                 spacesFormat = "  ";
-            writer.write(spacesFormat + counters[i]);
+            line += spacesFormat + counters[i];
         }
-        writer.write("\n");
+        line += "\n";
+        writer.write(line);
+    }
+    
+    private void printPilotState(){
+        switch(pilotState){
+            case PilotStates.RDFB: line += "RDFB ";
+                                   break;
+            case PilotStates.WTFB: line += "WTFB ";
+                                   break;    
+            case PilotStates.FLFW: line += "FLFW ";
+                                   break;
+            case PilotStates.DRPP: line += "DRPP ";
+                                   break;
+            case PilotStates.FLBK: line += "FLBK ";
+                                   break;
+            case PilotStates.ATRG: line += "ATRG ";
+                                   break;                       
+        }
+    }
+    
+    private void printHostessState(){
+        switch(hostessState){
+            case HostessStates.CKPS: line += "CKPS";
+                                   break;
+            case HostessStates.WTFL: line += "WTFL";
+                                   break;    
+            case HostessStates.RDTF: line += "RDTF";
+                                   break;
+            case HostessStates.WTPS: line += "WTPS";
+                                   break;                     
+        }
+    }
+    
+    private void printPassengerState(int i){
+        switch(passangerState[i]){
+            case PassengerStates.ATDS: line += " ATDS";
+                                   break;
+            case PassengerStates.GTAP: line += " GTAP";
+                                   break;    
+            case PassengerStates.INFL: line += " INFL";
+                                   break;
+            case PassengerStates.INQE: line += " INQE";
+                                   break;                     
+        }
     }
     
     /**
@@ -181,19 +251,19 @@ public class Repository implements IRepository_DepartureAirport,
      * @param stPilot 
      */
     @Override
-    public void setPilotState(STPilot stPilot) {
+    public void setPilotState(int stPilot) {
         try {
             rl.lock();
             pilotState = stPilot;
             switch(stPilot){
-                case RDFB:
+                case PilotStates.RDFB:
                     flightNumber += 1;
                     writer.write("\nFlight " + flightNumber + ": boarding started.\n");
                     break;
-                case FLBK:
+                case PilotStates.FLBK:
                     writer.write("\nFlight " + flightNumber + ": returning.\n");
                     break;
-                case DRPP:
+                case PilotStates.DRPP:
                     writer.write("\nFlight " + flightNumber + ": arrived.\n");
                     break;
             }
@@ -209,13 +279,15 @@ public class Repository implements IRepository_DepartureAirport,
      * @param stHostess 
      */
     @Override
-    public void setHostessState(STHostess stHostess) {
+    public void setHostessState(int stHostess) {
         try {
             rl.lock();
             if(stHostess != hostessState){
                 hostessState = stHostess;
-                if(stHostess == STHostess.RDTF){
-                    flights.put(flightNumber, passengersInPlane);
+                if(stHostess == HostessStates.RDTF){
+                    try{
+                        flights.write(passengersInPlane);
+                    } catch(MemException ex) {}
                     writer.write("\nFlight " + flightNumber + ": departed with "
                                  + passengersInPlane + " passengers.\n");
                 }
@@ -233,11 +305,11 @@ public class Repository implements IRepository_DepartureAirport,
      * @param passengerID 
      */
     @Override
-    public void setHostessState(STHostess stHostess, int passengerID) {
+    public void setHostessState(int stHostess, int passengerID) {
         try {
             rl.lock();
             hostessState = stHostess;
-            if(stHostess == STHostess.CKPS){
+            if(stHostess == HostessStates.CKPS){
                 passengersInQueue -= 1;
                 writer.write("\nFlight " + flightNumber + ": passenger "
                              + passengerID + " checked.\n");
@@ -255,18 +327,18 @@ public class Repository implements IRepository_DepartureAirport,
      * @param passengerID 
      */
     @Override
-    public void setPassengerState(STPassenger stPassenger, int passengerID) {
+    public void setPassengerState(int stPassenger, int passengerID) {
         try {
             rl.lock();
             passangerState[passengerID] = stPassenger;
             switch(stPassenger){
-                case INQE:
+                case PassengerStates.INQE:
                     passengersInQueue += 1;
                     break;
-                case INFL:
+                case PassengerStates.INFL:
                     passengersInPlane += 1;
                     break;
-                case ATDS:
+                case PassengerStates.ATDS:
                     passengersInPlane -= 1;
                     passengersAtDestination += 1;
                     break;

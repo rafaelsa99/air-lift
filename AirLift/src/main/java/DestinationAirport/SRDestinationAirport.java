@@ -1,7 +1,7 @@
 
 package DestinationAirport;
 
-import Common.STPassenger;
+import ActiveEntity.PassengerStates;
 import Repository.IRepository_DestinationAirport;
 
 /**
@@ -26,7 +26,7 @@ public class SRDestinationAirport implements IDestinationAirport_Passenger{
      */
     @Override
     public void leaveThePlane(int passengerID) {
-        iRepository.setPassengerState(STPassenger.ATDS, passengerID);
+        iRepository.setPassengerState(PassengerStates.ATDS, passengerID);
     }
     
 }

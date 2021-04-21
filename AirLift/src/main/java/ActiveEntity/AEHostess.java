@@ -1,7 +1,6 @@
 
 package ActiveEntity;
 
-import Common.STHostess;
 import DepartureAirport.IDepartureAirport_Hostess;
 import Plane.IPlane_Hostess;
 /**
@@ -19,11 +18,14 @@ public class AEHostess extends Thread{
      * @serialField IPlane_Hostess
      */
     private final IPlane_Hostess iPlane;
+<<<<<<< HEAD
     /**
      * States for Hostess
      * @serialField STHostess
      */
     private STHostess stHostess;
+=======
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * AEHostess instantiation
@@ -36,9 +38,14 @@ public class AEHostess extends Thread{
         iDepartureAirport = iDepartureAirport_Hostess;
         iPlane = iPlane_Hostess;
     }
+<<<<<<< HEAD
     /**
      * Hostess's lifecycle
      */
+=======
+    
+    @Override
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     public void run(){
         while(true){
             if(!iDepartureAirport.waitForNextFlight())
@@ -46,10 +53,8 @@ public class AEHostess extends Thread{
             iDepartureAirport.prepareForPassBoarding();
             do{
                 iDepartureAirport.checkDocuments();
-                stHostess = iDepartureAirport.waitForNextPassenger();
-            }while(stHostess != STHostess.RDTF);
+            }while(iDepartureAirport.waitForNextPassenger());
             iPlane.informPlaneReadyToTakeOff();
         }
-    }
-    
+    }   
 }

@@ -1,7 +1,6 @@
 
 package ActiveEntity;
 
-import Common.STPilot;
 import DepartureAirport.IDepartureAirport_Pilot;
 import Plane.IPlane_Pilot;
 
@@ -22,10 +21,13 @@ public class AEPilot extends Thread{
      * @serialField iPlane
      */
     private final IPlane_Pilot iPlane;
+<<<<<<< HEAD
     /**
      * 
      */
     private STPilot stPilot;
+=======
+>>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * Pilot Instantiation
