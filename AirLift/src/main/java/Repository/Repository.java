@@ -1,6 +1,5 @@
 
 package Repository;
-import Main.Parameters;
 import ActiveEntity.HostessStates;
 import ActiveEntity.PassengerStates;
 import ActiveEntity.PilotStates;
@@ -37,7 +36,7 @@ public class Repository implements IRepository_DepartureAirport,
     private int flightNumber;
     private MemFIFO<Integer> flights;
 
-    public Repository(int numPassengers) throws IOException{
+    public Repository(int numPassengers, String logFilename) throws IOException, MemException{
         rl = new ReentrantLock(true);
         pilotState = PilotStates.ATRG;
         hostessState = HostessStates.WTFL;
@@ -48,10 +47,8 @@ public class Repository implements IRepository_DepartureAirport,
         passengersInPlane = 0;
         passengersAtDestination = 0;
         flightNumber = 0;
-        try {
-            flights = new MemFIFO<>(numPassengers);
-        } catch (MemException ex) {}
-        logFile = new File(Parameters.LOG_FILENAME);
+        flights = new MemFIFO<>(numPassengers);
+        logFile = new File(logFilename);
         writer = new FileWriter(logFile);
         initializeLogFile(numPassengers);
     }
