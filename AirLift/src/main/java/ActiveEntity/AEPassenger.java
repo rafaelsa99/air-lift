@@ -26,15 +26,12 @@ public class AEPassenger extends Thread{
      * @serialField IPlane_Passenger
      */
     private final IPlane_Passenger iPlane;
-<<<<<<< HEAD
     /**
      * Passenger states
      * @serialField STPassenger
      */
-    private STPassenger stPassenger;
-=======
+    //private STPassenger stPassenger;
     private final int maxSleep;
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * Passenger's id 
@@ -67,18 +64,14 @@ public class AEPassenger extends Thread{
     public int getPassengerID() {
             return id;
     }
-<<<<<<< HEAD
-    /**
-     * Passenger's lifecycle
-     */
-=======
+    
 
     public int getMaxSleep() {
         return maxSleep;
     }
-    
-    @Override
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
+    /**
+     * Passenger's lifecycle
+     */
     public void run(){
         travelToAirport();
         iDepartureAirport.waitInQueue(id);

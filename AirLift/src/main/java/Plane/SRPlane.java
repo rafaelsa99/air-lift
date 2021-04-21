@@ -55,21 +55,17 @@ public class SRPlane implements IPlane_Pilot,
      * @serialfield readyTakeOff
      */
     private boolean readyTakeOff;
-<<<<<<< HEAD
     /**
-     * Array list
+     * Memory list
      * Number of passengers in the plane
      * @serialfield passengersOnPlane
      */
-    private final List<Integer> passengersOnPlane;
+    private MemList<Integer> passengersOnPlane;
     /**
      * bolean variable
      * True if flight has ended (arrived at departue airport)
      * @serialfield endOfFlight
      */
-=======
-    private MemList<Integer> passengersOnPlane;
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     private boolean endOfFlight;
     /**
      * 

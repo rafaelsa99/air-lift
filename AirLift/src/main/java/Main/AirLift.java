@@ -27,7 +27,6 @@ import java.io.IOException;
  */
 public class AirLift {
 
-<<<<<<< HEAD
     /**
      * Number of passengers
      * @serialfield numPassenger
@@ -65,17 +64,17 @@ public class AirLift {
     private SRDestinationAirport srDestinationAirport;
     
     /**
-     * Pilot state
+     * Pilot instantiation
      * @serialfield aePilot
      */
     private AEPilot aePilot;
     /**
-     * Hostess state
+     * Hostess instantiation
      * @serialfield aeHostess
      */
     private AEHostess aeHostess;
     /**
-     * Passenger state
+     * Passenger instantiation
      * @serialfield aePassenger
      */
     private AEPassenger[] aePassenger;
@@ -86,11 +85,7 @@ public class AirLift {
      */
     private Repository repository;
     
-    /**
-     * Airlift Instantiation
-     * @param args
-     * @throws IOException 
-     */
+    /*
     public AirLift(String[] args) throws IOException {
         numPassenger = Parameters.NUM_PASSENGER; //or from args
         maxPassenger = Parameters.MAX_PASSENGER; //or from args
@@ -98,19 +93,17 @@ public class AirLift {
         maxSleep = Parameters.MAX_SLEEP; //or from args
         
         repository = new Repository(numPassenger);
-        
-=======
-    private final SRDepartureAirport srDepartureAirport;
-    private final SRPlane srPlane;
-    private final SRDestinationAirport srDestinationAirport;    
-    private final AEPilot aePilot;
-    private final AEHostess aeHostess;
-    private final AEPassenger[] aePassenger;    
-    private final Repository repository;
+    }
+    */ 
+
     
-    private int numPassenger;
     private String logFilename;
     
+    /**
+     * Airlift Instantiation
+     * @param args
+     * @throws IOException 
+     */
     public AirLift(String[] args) throws IOException, MemException {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "
@@ -153,7 +146,6 @@ public class AirLift {
             throw new IllegalArgumentException("Invalid Arguments");
         }
                 
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
         //Shared regions instatiation
         repository = new Repository(numPassenger, logFilename);
         srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger,

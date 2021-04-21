@@ -18,19 +18,15 @@ public class Repository implements IRepository_DepartureAirport,
                                    IRepository_Plane,
                                    IRepository_DestinationAirport{
     // States abr
-<<<<<<< HEAD
     /**
      * States abreviation
      * @serialfield stateAbrev
      */
-    private final String [] stateAbrev ={"PT", "HT", "P", "InQ", "InF", "PTAL"};
+    private static final String [] stateAbrev ={"PT", "HT", "P", "InQ", "InF", "PTAL"};
     /**
      * Lock instantiation
      * @serialfield rl
      */
-=======
-    private static final String [] stateAbrev ={"PT", "HT", "P", "InQ", "InF", "PTAL"};
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     private final ReentrantLock rl;
     /**
      * Name of log file
@@ -42,33 +38,30 @@ public class Repository implements IRepository_DepartureAirport,
      * @serialfield writer
      */
     private final FileWriter writer;
-<<<<<<< HEAD
     
     
-    // States
-    /**
-     * Passenger's state
-     * @serialfield passangerState
-     */
-    private final STPassenger[] passangerState;
-    /**
-     * Pilot's state
-     * @serialfield pilotState
-     */
-    private STPilot pilotState;
-    /**
-     * Hostess's state
-     * @serialfield hostessState
-     */
-    private STHostess hostessState;
-=======
+//    // States
+//    /**
+//     * Passenger's state
+//     * @serialfield passangerState
+//     */
+//    private final STPassenger[] passangerState;
+//    /**
+//     * Pilot's state
+//     * @serialfield pilotState
+//     */
+//    private STPilot pilotState;
+//    /**
+//     * Hostess's state
+//     * @serialfield hostessState
+//     */
+//    private STHostess hostessState;
     private String line;
 
     // States
     private final int[] passangerState;
     private int pilotState;
     private int hostessState;
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * Number of passengers in queue to show documents
@@ -91,24 +84,30 @@ public class Repository implements IRepository_DepartureAirport,
      * @serialfield flightNumber
      */
     private int flightNumber;
-<<<<<<< HEAD
     /**
      * List with all flights completed
      * @serialfield flights
      */
-    private final LinkedHashMap<Integer, Integer> flights;
+    //private final LinkedHashMap<Integer, Integer> flights;
 
     /**
      * Repository instantiation
      * @param numPassengers
      * @throws IOException 
      */
+    /**
     public Repository(int numPassengers) throws IOException{
-=======
+        
+    }
+    * 
+    */
+    /**
+     * Memory FIFO with all flights completed
+     * @serialfield flights
+     */
     private MemFIFO<Integer> flights;
 
     public Repository(int numPassengers, String logFilename) throws IOException, MemException{
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
         rl = new ReentrantLock(true);
         pilotState = PilotStates.ATRG;
         hostessState = HostessStates.WTFL;

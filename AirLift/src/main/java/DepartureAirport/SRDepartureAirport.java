@@ -7,6 +7,7 @@ import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemFIFO;
 import Repository.IRepository_DepartureAirport;
+import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -81,19 +82,16 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * @serialField nextPassenger
      */
     private int nextPassenger;
-<<<<<<< HEAD
+    
     /**
-     * Array with the List of passengers in queue
+     * Memory FIFO with the List of passengers in queue
      * @serialField passengersQueue
      */
-    private final LinkedList<Integer> passengersQueue;
+    private MemFIFO<Integer> passengersQueue;
     /**
      * Minimum value for passenger inside a plane
      * @serialField minPassengers
      */
-=======
-    private MemFIFO<Integer> passengersQueue;
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     private final int minPassengers;
     /**
      * Maximum value for passenger inside a plane
@@ -110,13 +108,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * @serialField numPassengersLeftToTransport
      */
     private int numPassengersLeftToTransport;
-<<<<<<< HEAD
     /**
      * @serialfield maxSleep
      */
     private final int maxSleep;
-=======
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     
     /**
      * Instantiation of SRDepartureAirport
@@ -124,7 +119,6 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * @param minPassengers
      * @param maxPassengers
      * @param iRepository
-     * @param maxSleep 
      */
     public SRDepartureAirport(int numPassengers, int minPassengers, int maxPassengers,
                               IRepository_DepartureAirport iRepository) {
@@ -261,25 +255,23 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             rl.unlock();
         }
     }
-<<<<<<< HEAD
-
+   
     /**
      * Random time for passengers to get to airport
      * @param passengerID 
      */
+    /*
     @Override
     public void travelToAirport(int passengerID) {
         try {
             Thread.sleep((long)(Math.random() * maxSleep));
 	} catch (InterruptedException ex) {System.err.println("Exception occured"+ex.getMessage());}
     }
+    */
     /**
      * Passengers wait in queue while they are not called by the Hostess
      * @param passengerID 
      */
-=======
-    
->>>>>>> 4b6575849ebaca5ec8aad99646ce091ce7dfd2bf
     @Override
     public void waitInQueue(int passengerID) {
         try{
