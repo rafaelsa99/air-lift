@@ -1,7 +1,6 @@
 
 package ActiveEntity;
 
-import Common.STPilot;
 import DepartureAirport.IDepartureAirport_Pilot;
 import Plane.IPlane_Pilot;
 
@@ -14,7 +13,6 @@ public class AEPilot extends Thread{
     //Shared Regions
     private final IDepartureAirport_Pilot iDepartureAirport;
     private final IPlane_Pilot iPlane;
-    private STPilot stPilot;
     
     public AEPilot(IDepartureAirport_Pilot iDepartureAirport, IPlane_Pilot iPlane) {
         super("Pilot");

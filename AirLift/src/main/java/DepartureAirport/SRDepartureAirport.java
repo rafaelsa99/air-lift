@@ -1,11 +1,12 @@
 
 package DepartureAirport;
 
-import Common.STHostess;
-import Common.STPassenger;
-import Common.STPilot;
+import ActiveEntity.HostessStates;
+import ActiveEntity.PassengerStates;
+import ActiveEntity.PilotStates;
+import Common.MemException;
+import Common.MemFIFO;
 import Repository.IRepository_DepartureAirport;
-import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,15 +29,14 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     private boolean documentsShown;
     private boolean canEnterPlane;
     private int nextPassenger;
-    private final LinkedList<Integer> passengersQueue;
+    private MemFIFO<Integer> passengersQueue;
     private final int minPassengers;
     private final int maxPassengers;
     private int numPassengersOnPlane;
     private int numPassengersLeftToTransport;
-    private final int maxSleep;
     
     public SRDepartureAirport(int numPassengers, int minPassengers, int maxPassengers,
-                              IRepository_DepartureAirport iRepository, int maxSleep) {
+                              IRepository_DepartureAirport iRepository) {
         this.iRepository = iRepository;
         rl = new ReentrantLock(true);
         boarding = rl.newCondition();
@@ -49,13 +49,14 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         readyForBoarding = false;
         documentsShown = false;
         canEnterPlane = false;
-        passengersQueue = new LinkedList<>();
+        try {
+            passengersQueue = new MemFIFO<>(numPassengers);
+        } catch (MemException ex) {}
         nextPassenger = -1;
         this.maxPassengers = maxPassengers;
         this.minPassengers = minPassengers;
         numPassengersOnPlane = 0;
         numPassengersLeftToTransport = numPassengers;
-        this.maxSleep = maxSleep;
     }
     
     @Override
@@ -66,7 +67,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
                 iRepository.printSumUp();
                 return false;
             }
-            iRepository.setPilotState(STPilot.RDFB);
+            iRepository.setPilotState(PilotStates.RDFB);
             readyForBoarding = true;
             boarding.signal();
         } catch(Exception ex){}
@@ -80,8 +81,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     public void checkDocuments() {
         try{
             rl.lock();
-            nextPassenger = passengersQueue.removeFirst();
-            iRepository.setHostessState(STHostess.CKPS, nextPassenger);
+            try {
+                nextPassenger = passengersQueue.read();
+            } catch (MemException ex) {}
+            iRepository.setHostessState(HostessStates.CKPS, nextPassenger);
             queue[nextPassenger].signal();
             while(!documentsShown)
                 check.await();
@@ -93,33 +96,33 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     }
 
     @Override
-    public STHostess waitForNextPassenger() {
+    public boolean waitForNextPassenger() {
         try{
             rl.lock();
-            iRepository.setHostessState(STHostess.WTPS);
+            iRepository.setHostessState(HostessStates.WTPS);
             canEnterPlane = true;
             queue[nextPassenger].signal();
             numPassengersOnPlane += 1;
             numPassengersLeftToTransport -= 1;
             while(canEnterPlane)
                 pLeaving.await();
-            if((passengersQueue.isEmpty() && numPassengersOnPlane >= minPassengers) ||
+            if((passengersQueue.empty()&& numPassengersOnPlane >= minPassengers) ||
                 numPassengersOnPlane == maxPassengers || numPassengersLeftToTransport == 0)
-                return STHostess.RDTF;
-            while(passengersQueue.isEmpty())
+                return false;
+            while(passengersQueue.empty())
                 passenger.await();
         } catch(InterruptedException ex){}
         finally{
             rl.unlock();
         }
-        return STHostess.CKPS;
+        return true;
     }
 
     @Override
     public boolean waitForNextFlight() {
         try{
             rl.lock();
-            iRepository.setHostessState(STHostess.WTFL);
+            iRepository.setHostessState(HostessStates.WTFL);
             if(numPassengersLeftToTransport == 0)
                 return false;
             while(!readyForBoarding)
@@ -137,29 +140,24 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     public void prepareForPassBoarding() {
         try{
             rl.lock();
-            iRepository.setHostessState(STHostess.WTPS);
-            while(passengersQueue.isEmpty())
+            iRepository.setHostessState(HostessStates.WTPS);
+            while(passengersQueue.empty())
                 passenger.await();
         } catch(InterruptedException ex){}
         finally{
             rl.unlock();
         }
     }
-
-    @Override
-    public void travelToAirport(int passengerID) {
-        try {
-            Thread.sleep((long)(Math.random() * maxSleep));
-	} catch (InterruptedException e) {}
-    }
-
+    
     @Override
     public void waitInQueue(int passengerID) {
         try{
             rl.lock();
-            iRepository.setPassengerState(STPassenger.INQE, passengerID);
-            passengersQueue.add(passengerID);
-            if(passengersQueue.size() == 1) //If it was empty
+            iRepository.setPassengerState(PassengerStates.INQE, passengerID);
+            try {
+                passengersQueue.write(passengerID);
+            } catch (MemException ex) {}
+            if(passengersQueue.getCounter()== 1) //If it was empty
                 passenger.signal();
             while(nextPassenger != passengerID)
                 queue[passengerID].await();

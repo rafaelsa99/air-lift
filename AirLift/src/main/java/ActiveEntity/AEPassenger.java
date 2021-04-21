@@ -1,11 +1,9 @@
 
 package ActiveEntity;
 
-import Common.STPassenger;
 import DepartureAirport.IDepartureAirport_Passenger;
 import DestinationAirport.IDestinationAirport_Passenger;
 import Plane.IPlane_Passenger;
-import java.util.*;
 
 /**
  *
@@ -15,13 +13,13 @@ public class AEPassenger extends Thread{
     private final IDepartureAirport_Passenger iDepartureAirport;
     private final IDestinationAirport_Passenger iDestinationAirport;
     private final IPlane_Passenger iPlane;
-    private STPassenger stPassenger;
+    private final int maxSleep;
     
     /**
      * Passenger's id 
      * @serialField id
      */
-    private int id;
+    private final int id;
     /**
      * Passenger instantiation
      * 
@@ -30,12 +28,13 @@ public class AEPassenger extends Thread{
     public AEPassenger(IDepartureAirport_Passenger pDepartureAirport_passenger,
                        IDestinationAirport_Passenger pDestinationAirport_passenger,
                        IPlane_Passenger pPlane_passenger,
-                       int id) {
+                       int id, int maxSleep) {
         super("Passenger " + id);
         this.id = id;
         iDepartureAirport   = pDepartureAirport_passenger;
         iDestinationAirport = pDestinationAirport_passenger;
         iPlane = pPlane_passenger;
+        this.maxSleep = maxSleep;
     }
     /**
      * Returns this Passenger's id.
@@ -44,14 +43,25 @@ public class AEPassenger extends Thread{
     public int getPassengerID() {
             return id;
     }
+
+    public int getMaxSleep() {
+        return maxSleep;
+    }
     
+    @Override
     public void run(){
-        iDepartureAirport.travelToAirport(id);
+        travelToAirport();
         iDepartureAirport.waitInQueue(id);
         iDepartureAirport.showDocuments(id);
         iPlane.boardThePlane(id);
         iPlane.waitForEndOfFlight(id);
         iDestinationAirport.leaveThePlane(id);
         iPlane.leaveThePlane(id);
+    }
+    
+    private void travelToAirport() {
+        try {
+            Thread.sleep((long)(Math.random() * maxSleep));
+	} catch (InterruptedException e) {}
     }
 }

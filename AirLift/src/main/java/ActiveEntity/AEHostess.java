@@ -1,7 +1,6 @@
 
 package ActiveEntity;
 
-import Common.STHostess;
 import DepartureAirport.IDepartureAirport_Hostess;
 import Plane.IPlane_Hostess;
 /**
@@ -12,7 +11,6 @@ public class AEHostess extends Thread{
     
     private final IDepartureAirport_Hostess iDepartureAirport;
     private final IPlane_Hostess iPlane;
-    private STHostess stHostess;
     
     /**
      * Hostess instantiation
@@ -24,6 +22,8 @@ public class AEHostess extends Thread{
         iDepartureAirport = iDepartureAirport_Hostess;
         iPlane = iPlane_Hostess;
     }
+    
+    @Override
     public void run(){
         while(true){
             if(!iDepartureAirport.waitForNextFlight())
@@ -31,10 +31,8 @@ public class AEHostess extends Thread{
             iDepartureAirport.prepareForPassBoarding();
             do{
                 iDepartureAirport.checkDocuments();
-                stHostess = iDepartureAirport.waitForNextPassenger();
-            }while(stHostess != STHostess.RDTF);
+            }while(iDepartureAirport.waitForNextPassenger());
             iPlane.informPlaneReadyToTakeOff();
         }
-    }
-    
+    }   
 }

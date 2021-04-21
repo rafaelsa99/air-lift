@@ -4,7 +4,6 @@ package Main;
 import ActiveEntity.AEHostess;
 import ActiveEntity.AEPassenger;
 import ActiveEntity.AEPilot;
-import Common.Parameters;
 import DepartureAirport.IDepartureAirport_Hostess;
 import DepartureAirport.IDepartureAirport_Passenger;
 import DepartureAirport.IDepartureAirport_Pilot;
@@ -27,20 +26,20 @@ import java.io.IOException;
  */
 public class AirLift {
 
-    private int numPassenger;
-    private int maxPassenger;
-    private int minPassenger;
-    private int maxSleep;
+    private final int numPassenger;
+    private final int maxPassenger;
+    private final int minPassenger;
+    private final int maxSleep;
     
-    private SRDepartureAirport srDepartureAirport;
-    private SRPlane srPlane;
-    private SRDestinationAirport srDestinationAirport;
+    private final SRDepartureAirport srDepartureAirport;
+    private final SRPlane srPlane;
+    private final SRDestinationAirport srDestinationAirport;
     
-    private AEPilot aePilot;
-    private AEHostess aeHostess;
-    private AEPassenger[] aePassenger;
+    private final AEPilot aePilot;
+    private final AEHostess aeHostess;
+    private final AEPassenger[] aePassenger;
     
-    private Repository repository;
+    private final Repository repository;
     
     public AirLift(String[] args) throws IOException {
         numPassenger = Parameters.NUM_PASSENGER; //or from args
@@ -52,8 +51,7 @@ public class AirLift {
         
         //Shared regions instatiation
         srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger,
-                                                    (IRepository_DepartureAirport) repository,
-                                                    maxSleep);
+                                                    (IRepository_DepartureAirport) repository);
         srPlane = new SRPlane(numPassenger, (IRepository_Plane) repository, maxSleep);
         srDestinationAirport = new SRDestinationAirport((IRepository_DestinationAirport) repository);
         
@@ -67,7 +65,7 @@ public class AirLift {
         for (int i = 0; i < numPassenger; i++) {
             aePassenger[i] = new AEPassenger((IDepartureAirport_Passenger)srDepartureAirport,
                                              (IDestinationAirport_Passenger)srDestinationAirport,
-                                             (IPlane_Passenger)srPlane, i);
+                                             (IPlane_Passenger)srPlane, i, maxSleep);
         }
         
         //...
@@ -88,7 +86,7 @@ public class AirLift {
             aeHostess.join();
             for (int i = 0; i < numPassenger; i++) 
                 aePassenger[i].join();
-        }catch(Exception ex){
+        }catch(InterruptedException ex){
             System.out.println(ex.getMessage());
         }
         

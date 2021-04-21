@@ -1,12 +1,12 @@
     
 package Plane;
 
-import Common.STHostess;
-import Common.STPassenger;
-import Common.STPilot;
+import ActiveEntity.HostessStates;
+import ActiveEntity.PassengerStates;
+import ActiveEntity.PilotStates;
+import Common.MemException;
+import Common.MemList;
 import Repository.IRepository_Plane;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,7 +24,7 @@ public class SRPlane implements IPlane_Pilot,
     private final Condition deboarding;
     private final Condition[] flight;
     private boolean readyTakeOff;
-    private final List<Integer> passengersOnPlane;
+    private MemList<Integer> passengersOnPlane;
     private boolean endOfFlight;
     private final int maxSleep;
     
@@ -37,7 +37,9 @@ public class SRPlane implements IPlane_Pilot,
         for (int i = 0; i < numPassengers; i++)
             flight[i] = rl.newCondition();
         readyTakeOff = false;
-        passengersOnPlane = new ArrayList<>();
+        try {
+            passengersOnPlane = new MemList<>(numPassengers);
+        } catch (MemException ex) {}
         endOfFlight = false;
         this.maxSleep = maxSleep;
     }
@@ -46,11 +48,11 @@ public class SRPlane implements IPlane_Pilot,
     public void waitForAllInBoard() {
         try{
             rl.lock();
-            iRepository.setPilotState(STPilot.WTFB);
+            iRepository.setPilotState(PilotStates.WTFB);
             while(!readyTakeOff)
                 takeOff.await();
             readyTakeOff = false;
-        } catch(Exception ex){}
+        } catch(InterruptedException ex){}
         finally{
             rl.unlock();
         }
@@ -58,7 +60,7 @@ public class SRPlane implements IPlane_Pilot,
 
     @Override
     public void flyToDestinationPoint() {
-        iRepository.setPilotState(STPilot.FLFW);
+        iRepository.setPilotState(PilotStates.FLFW);
         try {
             Thread.sleep((long)(Math.random() * maxSleep));
 	} catch (InterruptedException e) {}
@@ -68,14 +70,14 @@ public class SRPlane implements IPlane_Pilot,
     public void announceArrival() {
         try{
             rl.lock();
-            iRepository.setPilotState(STPilot.DRPP);
+            iRepository.setPilotState(PilotStates.DRPP);
             endOfFlight = true;
-            for (int i = 0; i < flight.length; i++) 
-                flight[i].signal();
-            while(!passengersOnPlane.isEmpty())
+            for (Condition cFlight : flight)
+                cFlight.signal();
+            while(!passengersOnPlane.empty())
                 deboarding.await();
             endOfFlight = false;
-        } catch(Exception ex){}
+        } catch(InterruptedException ex){}
         finally{
             rl.unlock();
         }
@@ -83,7 +85,7 @@ public class SRPlane implements IPlane_Pilot,
 
     @Override
     public void flyToDeparturePoint() {
-        iRepository.setPilotState(STPilot.FLBK);
+        iRepository.setPilotState(PilotStates.FLBK);
         try {
             Thread.sleep((long)(Math.random() * maxSleep));
 	} catch (InterruptedException e) {}
@@ -91,14 +93,14 @@ public class SRPlane implements IPlane_Pilot,
 
     @Override
     public void parkAtTransferGate() {
-        iRepository.setPilotState(STPilot.ATRG);
+        iRepository.setPilotState(PilotStates.ATRG);
     }
 
     @Override
     public void informPlaneReadyToTakeOff() {
         try{
             rl.lock();
-            iRepository.setHostessState(STHostess.RDTF);
+            iRepository.setHostessState(HostessStates.RDTF);
             readyTakeOff = true;
             takeOff.signal();
         } catch(Exception ex){}
@@ -111,9 +113,9 @@ public class SRPlane implements IPlane_Pilot,
     public void boardThePlane(int passengerID) {
         try{
             rl.lock();
-            iRepository.setPassengerState(STPassenger.INFL, passengerID);
-            passengersOnPlane.add(passengerID);
-        } catch(Exception ex){}
+            iRepository.setPassengerState(PassengerStates.INFL, passengerID);
+            passengersOnPlane.write(passengerID);
+        } catch(MemException ex){}
         finally{
             rl.unlock();
         }
@@ -125,7 +127,7 @@ public class SRPlane implements IPlane_Pilot,
             rl.lock();
             while(!endOfFlight)
                 flight[passengerID].await();
-        } catch(Exception ex){}
+        } catch(InterruptedException ex){}
         finally{
             rl.unlock();
             
@@ -136,10 +138,10 @@ public class SRPlane implements IPlane_Pilot,
     public void leaveThePlane(int passengerID) {
         try{
             rl.lock();
-            passengersOnPlane.remove(Integer.valueOf(passengerID));
-            if(passengersOnPlane.isEmpty())
+            passengersOnPlane.read(passengerID);
+            if(passengersOnPlane.empty())
                 deboarding.signal();
-        } catch(Exception ex){}
+        } catch(MemException ex){}
         finally{
             rl.unlock();
         }
