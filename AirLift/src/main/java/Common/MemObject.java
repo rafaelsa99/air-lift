@@ -30,7 +30,7 @@ public abstract class MemObject<R> {
    *     @param nElem size of the memory to be created
    *     @throws MemException when the memory size is not valid
    */
-
+   @SuppressWarnings("unchecked")
    protected MemObject (int nElem) throws MemException {
        if(nElem > 0)
            mem = (R []) new Object[nElem];

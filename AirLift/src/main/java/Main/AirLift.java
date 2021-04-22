@@ -22,93 +22,60 @@ import Repository.Repository;
 import java.io.IOException;
 
 /**
- *
+ * Simulation of the air lift problem.
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AirLift {
 
     /**
-     * Number of passengers
-     * @serialfield numPassenger
+     * Number of passengers to transport on the simulation.
      */
-    private int numPassenger;
+    private int numPassenger; 
     /**
-     * Maximum mumber of passengers in a flight
-     * @serialfield maxPassenger
+     * Name of the logging file.
      */
-    private int maxPassenger;
+    private String logFilename; 
     /**
-     * Minimum number of passengers in a flight
-     * @serialfield minPassenger
+     * Reference to the departure airport.
      */
-    private int minPassenger;
+    private final SRDepartureAirport srDepartureAirport;
     /**
-     * @serialfield maxSleep
+     * Reference to the plane.
      */
-    private int maxSleep;
-    
+    private final SRPlane srPlane;
     /**
-     * SRDepartureAirport
-     * @serialfield srDepartureAirport
+     * Reference to the destination airport.
      */
-    private SRDepartureAirport srDepartureAirport;
+    private final SRDestinationAirport srDestinationAirport;
     /**
-     * srPlane
-     * @serialfield srPlane
+     * Pilot thread.
      */
-    private SRPlane srPlane;
+    private final AEPilot aePilot;
     /**
-     * SRDestinationAirport
-     * @serialfield srDestinationAirport
+     * Hostess thread.
      */
-    private SRDestinationAirport srDestinationAirport;
-    
+    private final AEHostess aeHostess;
     /**
-     * Pilot instantiation
-     * @serialfield aePilot
+     * Array of passengers threads.
      */
-    private AEPilot aePilot;
+    private final AEPassenger[] aePassenger;
     /**
-     * Hostess instantiation
-     * @serialfield aeHostess
+     * Reference to the repository.
      */
-    private AEHostess aeHostess;
-    /**
-     * Passenger instantiation
-     * @serialfield aePassenger
-     */
-    private AEPassenger[] aePassenger;
-    
-    /**
-     * Repository
-     * @serialfield repository
-     */
-    private Repository repository;
-    
-    /*
-    public AirLift(String[] args) throws IOException {
-        numPassenger = Parameters.NUM_PASSENGER; //or from args
-        maxPassenger = Parameters.MAX_PASSENGER; //or from args
-        minPassenger = Parameters.MIN_PASSENGER; //or from args
-        maxSleep = Parameters.MAX_SLEEP; //or from args
-        
-        repository = new Repository(numPassenger);
-    }
-    */ 
+    private final Repository repository;
 
-    
-    private String logFilename;
-    
+
     /**
-     * Airlift Instantiation
-     * @param args
-     * @throws IOException 
+     * Instantiation of the AirLift.
+     * @param args program arguments
+     * @throws IOException if an error i/o error occurred.
+     * @throws Common.MemException if an error occurred creating the memory.
      */
-    public AirLift(String[] args) throws IOException, MemException {
+    public AirLift(String[] args) throws MemException, IOException {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "
                     + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")"
-                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in miliseconds (Default = " + Parameters.MAX_SLEEP + ")"
+                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in milliseconds (Default = " + Parameters.MAX_SLEEP + ")"
                     + "\n\t-l <LOG_FILENAME>: Filename of the logging file (Default = \"" + Parameters.LOG_FILENAME + "\")"
                     + "\n\t-i <MIN_PASSENGER>: Minimum number of passengers on a flight (Default = " + Parameters.MIN_PASSENGER + ")"
                     + "\n\t-a <MAX_PASSENGER>: Maximum number of passengers on a flight (Default = " + Parameters.MAX_PASSENGER + ")");
@@ -139,7 +106,7 @@ public class AirLift {
         } catch(IllegalArgumentException ex){
             System.out.println("Optional arguments: "
                     + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")"
-                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in miliseconds (Default = " + Parameters.MAX_SLEEP + ")"
+                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in milliseconds (Default = " + Parameters.MAX_SLEEP + ")"
                     + "\n\t-l <LOG_FILENAME>: Filename of the logging file (Default = \"" + Parameters.LOG_FILENAME + "\")"
                     + "\n\t-i <MIN_PASSENGER>: Minimum number of passengers on a flight (Default = " + Parameters.MIN_PASSENGER + ")"
                     + "\n\t-a <MAX_PASSENGER>: Maximum number of passengers on a flight (Default = " + Parameters.MAX_PASSENGER + ")");
@@ -168,7 +135,7 @@ public class AirLift {
     }
     
     /**
-     * Function to start the program
+     * Start the threads and wait for them to terminate.
      */
     private void startSimulation(){
         System.out.println("Simulation Started!");
@@ -194,14 +161,14 @@ public class AirLift {
     }
     
     /**
-     * Main fuction
-     * @param args 
+     * Main method.
+     * @param args program arguments
      */
     public static void main(String[] args) {
         try {
             new AirLift(args).startSimulation();
         } catch (MemException | IOException | IllegalArgumentException ex) {
-            System.out.println("Exception: " + ex.getMessage());
+            System.err.println("Exception: " + ex.getMessage());
         }
     }
 }

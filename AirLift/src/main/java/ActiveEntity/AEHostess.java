@@ -3,31 +3,26 @@ package ActiveEntity;
 
 import DepartureAirport.IDepartureAirport_Hostess;
 import Plane.IPlane_Hostess;
+
 /**
- *
+ * Hostess thread, which simulates the hostess life cycle.
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AEHostess extends Thread{
+    
     /**
-     * IDepartureAirport_Hostess shared region for Hostess
-     * @serialField IDepartureAirport_Hostess
+     * Interface of the Hostess to the reference of the Departure Airport.
      */
     private final IDepartureAirport_Hostess iDepartureAirport;
     /**
-     * IPlane_Hostess shared region for Hostess
-     * @serialField IPlane_Hostess
+     * Interface of the Hostess to the reference of the Plane.
      */
     private final IPlane_Hostess iPlane;
-    /**
-     * States for Hostess
-     * @serialField STHostess
-     */
-    //private STHostess stHostess;
     
     /**
-     * AEHostess instantiation
-     * @param IDepartureAirport_Hostess iDepartureAirport_Hostess
-     * @param IPlane_Hostess iPlane_Hostess
+     * Instantiation of a Hostess thread.
+     * @param iDepartureAirport_Hostess interface of the Hostess to the reference of the Departure Airport 
+     * @param iPlane_Hostess interface of the Hostess to the reference of the Plane
      */
     public AEHostess(IDepartureAirport_Hostess iDepartureAirport_Hostess,
                      IPlane_Hostess iPlane_Hostess ) {
@@ -36,9 +31,8 @@ public class AEHostess extends Thread{
         iPlane = iPlane_Hostess;
     }
     /**
-     * Hostess's lifecycle
+     * Life cycle of the Hostess.
      */
-    
     @Override
     public void run(){
         while(true){

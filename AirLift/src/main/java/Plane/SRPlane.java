@@ -11,7 +11,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
+ * Plane.
+ * It is responsible for keeping a constantly updated account of the passengers inside the plane.
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class SRPlane implements IPlane_Pilot, 
@@ -19,67 +20,60 @@ public class SRPlane implements IPlane_Pilot,
                                 IPlane_Passenger{
 
     /**
-     * Repository
-     * @serialfield iRepository
+     * Interface of the plane to the reference of the repository.
      */
     private final IRepository_Plane iRepository;
     /**
-     * Lock instantiation
-     * @serialfield rl
+     * Reentrant Lock.
      */
     private final ReentrantLock rl;
     /**
-     * Contition variable
-     * sender: Pilot
-     * receiver: 
-     * @serialfield takeOff
+     * Condition for the pilot to start the flight.
+     * Sender: Hostess signals
+     * Receiver: Pilot is signaled
      */
     private final Condition takeOff;
     /**
-     * Condition variable
-     * Sender: Pilot signals 
-     * Receiver: 
-     * @serialfield deboarding
+     * Condition for while passenger deboarding is in progress.
+     * Sender: Last passenger to leave the plane signals
+     * Receiver: Pilot is signaled
      */
     private final Condition deboarding;
     /**
-     * Condition variable
-     * Sender: 
-     * Receiver: 
-     * @serialfield flight
+     * Condition for the passenger to leave the plane at the end of the flight (one for each passenger).
+     * Sender: Pilot signals
+     * Receiver: Passenger is signaled
      */
     private final Condition[] flight;
     /**
-     * bolean variable
-     * true if plane is ready to takeoff
-     * @serialfield readyTakeOff
+     * Flag indicating whether the plane is ready to take off.
+     * True if the plane is ready to take off.. 
+     * False otherwise.
      */
     private boolean readyTakeOff;
     /**
-     * Memory list
-     * Number of passengers in the plane
-     * @serialfield passengersOnPlane
+     * Memory FIFO with the passengers on the plane.
      */
-    private MemList<Integer> passengersOnPlane;
+    private final MemList<Integer> passengersOnPlane;
     /**
-     * bolean variable
-     * True if flight has ended (arrived at departue airport)
-     * @serialfield endOfFlight
+     * Flag indicating whether the flight is over.
+     * True if flight is over.
+     * False otherwise.
      */
     private boolean endOfFlight;
     /**
-     * 
-     * @serialfield maxSleep
+     * Maximum sleeping time, in milliseconds.
      */
     private final int maxSleep;
     
     /**
-     * SR Plane instatiation
-     * @param numPassengers
-     * @param iRepository
-     * @param maxSleep 
+     * Instantiation of the plane.
+     * @param numPassengers number of passengers to transport
+     * @param iRepository interface of the plane to the reference of the repository
+     * @param maxSleep maximum sleeping time (ms)
+     * @throws Common.MemException if it was not possible to create the List
      */
-    public SRPlane(int numPassengers, IRepository_Plane iRepository, int maxSleep) {
+    public SRPlane(int numPassengers, IRepository_Plane iRepository, int maxSleep) throws MemException {
         this.iRepository = iRepository;
         rl = new ReentrantLock(true);
         takeOff = rl.newCondition();
@@ -88,15 +82,14 @@ public class SRPlane implements IPlane_Pilot,
         for (int i = 0; i < numPassengers; i++)
             flight[i] = rl.newCondition();
         readyTakeOff = false;
-        try {
-            passengersOnPlane = new MemList<>(numPassengers);
-        } catch (MemException ex) {}
+        passengersOnPlane = new MemList<>(numPassengers);
         endOfFlight = false;
         this.maxSleep = maxSleep;
     }
     
     /**
-     * waits for passengers to get on board
+     * Operation for the pilot to wait for the boarding process to end.
+     * The pilot waits for the signal of the hostess indicating that the plane is ready to take off.
      */
     @Override
     public void waitForAllInBoard() {
@@ -106,14 +99,15 @@ public class SRPlane implements IPlane_Pilot,
             while(!readyTakeOff)
                 takeOff.await();
             readyTakeOff = false;
-        } catch(InterruptedException ex){}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
 
     /**
-     * Random value to simualte passenger going to airport
+     * Operation for the pilot to fly the plane to the Destination Point.
+     * The thread sleeps for a random period of time, for a maximum o maxSleep time.
      */
     @Override
     public void flyToDestinationPoint() {
@@ -124,7 +118,8 @@ public class SRPlane implements IPlane_Pilot,
     }
 
     /**
-     * Pilot anounces the flight has arrived
+     * Operation for the pilot to announce that the plane has arrived to the destination airport.
+     * The pilot signals all passengers to leave the plane, and waits for the last passenger to leave.
      */
     @Override
     public void announceArrival() {
@@ -137,14 +132,15 @@ public class SRPlane implements IPlane_Pilot,
             while(!passengersOnPlane.empty())
                 deboarding.await();
             endOfFlight = false;
-        } catch(InterruptedException ex){}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
 
     /**
-     * Random time simulating the plane traveling to departure airport
+     * Operation for the pilot to fly the plane to the Departure Point.
+     * The thread sleeps for a random period of time, for a maximum o maxSleep time.
      */
     @Override
     public void flyToDeparturePoint() {
@@ -155,7 +151,7 @@ public class SRPlane implements IPlane_Pilot,
     }
 
     /**
-     * Sets state of pilot when the plane arrives at transfer gate
+     * Operation for the pilot to park the plane at the transfer gate.
      */
     @Override
     public void parkAtTransferGate() {
@@ -163,7 +159,8 @@ public class SRPlane implements IPlane_Pilot,
     }
 
     /**
-     * Hostess anounces the plane is ready to takeoff
+     * Operation for the hostess to inform that the plane is ready to take off.
+     * The hostess signals the pilot to start the flight.
      */
     @Override
     public void informPlaneReadyToTakeOff() {
@@ -172,16 +169,15 @@ public class SRPlane implements IPlane_Pilot,
             iRepository.setHostessState(HostessStates.RDTF);
             readyTakeOff = true;
             takeOff.signal();
-        } catch(Exception ex){}
-        finally{
+        } finally{
             rl.unlock();
         }
     }
 
     /**
-     * Passenger with id passengerID boards the plane and its added to the list of
-     * passengers in the plane
-     * @param passengerID 
+     * Operation for the passengers to board the plane.
+     * The passenger is added to the list of passengers on the plane.
+     * @param passengerID passenger id
      */
     @Override
     public void boardThePlane(int passengerID) {
@@ -189,15 +185,16 @@ public class SRPlane implements IPlane_Pilot,
             rl.lock();
             iRepository.setPassengerState(PassengerStates.INFL, passengerID);
             passengersOnPlane.write(passengerID);
-        } catch(MemException ex){}
+        } catch(MemException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
 
     /**
-     * Passenger waits until the flight has arrived at the destination airport
-     * @param passengerID 
+     * Operation for the passenger to wait for the end of the flight.
+     * The passenger waits to be signaled by the pilot that he can leave the plane.
+     * @param passengerID passenger id
      */
     @Override
     public void waitForEndOfFlight(int passengerID) {
@@ -205,7 +202,7 @@ public class SRPlane implements IPlane_Pilot,
             rl.lock();
             while(!endOfFlight)
                 flight[passengerID].await();
-        } catch(InterruptedException ex){}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
             
@@ -213,8 +210,9 @@ public class SRPlane implements IPlane_Pilot,
     }
 
     /**
-     * Passengers leave the plane
-     * @param passengerID 
+     * Operation for the passenger leave the plane.
+     * If it is the last passenger to leave the plane, the passenger signals the pilot.
+     * @param passengerID passenger id
      */
     @Override
     public void leaveThePlane(int passengerID) {
@@ -223,7 +221,7 @@ public class SRPlane implements IPlane_Pilot,
             passengersOnPlane.read(passengerID);
             if(passengersOnPlane.empty())
                 deboarding.signal();
-        } catch(MemException ex){}
+        } catch(MemException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }

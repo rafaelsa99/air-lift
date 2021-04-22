@@ -7,12 +7,13 @@ import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemFIFO;
 import Repository.IRepository_DepartureAirport;
-import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
+ * Departure Airport.
+ * It is responsible for keeping a constantly updated account of the passengers inside the airport, waiting to board the plane.
+ * 
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class SRDepartureAirport implements IDepartureAirport_Hostess, 
@@ -20,108 +21,96 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
                                            IDepartureAirport_Pilot{
 
     /**
-     * iRepository shared region
-     * @serialField IRepository_DepartureAirport
+     * Interface of the departure airport to the reference of the repository.
      */
     private final IRepository_DepartureAirport iRepository;
     /**
-     * Lock instantiation
-     * @serialField ReentrantLock
+     * Reentrant Lock.
      */
     private final ReentrantLock rl;
     /**
-     * Condition variable
+     * Condition for the boarding process to start.
      * Sender: Pilot signals
      * Receiver: Hostess is signaled
      */
     private final Condition boarding;
     /**
-     * Condition variable
+     * Condition for the passenger to leave the queue (one for each passenger).
      * Sender: Hostess signals
      * Receiver: Passenger is signaled
      */
     private final Condition[] queue;
     /**
-     * Condition variable
-     * Sender: Hostess signals
-     * Receiver: Passenger is signaled
+     * Condition for when there are no passengers in the queue.
+     * Sender: Passenger signals
+     * Receiver: Hostess is signaled
      */
     private final Condition passenger;
      /**
-     * Condition variable
+     * Condition for checking the passenger's documents.
      * Sender: Passenger signals
      * Receiver: Hostess is signaled
      */
     private final Condition check;
     /**
-     * Condition variable
+     * Condition for while the passenger is leaving the queue.
      * Sender: Passenger signals
      * Receiver: Hostess is signaled
      */
     private final Condition pLeaving;
     /**
-     * boolean
-     * True if plane is ready for boarding (Arrived at departure airport)
-     * @serialField readyForBoarding
+     * Flag indicating whether the boarding process can start.
+     * True if the plane is ready for boarding. 
+     * False otherwise.
      */
     private boolean readyForBoarding;
     /**
-     * boolean
-     * True if the passenger as shown his documents
-     * @serialField documentsShown
+     * Flag indicating whether the passenger has shown their documents.
+     * True if the passenger as shown his documents. 
+     * False otherwise.
      */
     private boolean documentsShown;
     /**
-     * Boolean variable
-     * True if the passenger is permited to enter the plane
-     * @serialField canEnterPlane
+     * Flag indicating whether the passenger may leave the queue to board the plane.
+     * True if the passenger is permitted to enter the plane.
+     * False otherwise.
      */
     private boolean canEnterPlane;
     /**
-     * Next passenger in queue
-     * @serialField nextPassenger
+     * Id of the next passenger in the queue.
      */
     private int nextPassenger;
-    
     /**
-     * Memory FIFO with the List of passengers in queue
-     * @serialField passengersQueue
+     * Memory FIFO with the passengers in queue.
      */
-    private MemFIFO<Integer> passengersQueue;
+    private final MemFIFO<Integer> passengersQueue;
     /**
-     * Minimum value for passenger inside a plane
-     * @serialField minPassengers
+     * Minimum number of passengers in a flight.
      */
     private final int minPassengers;
     /**
-     * Maximum value for passenger inside a plane
-     * @serialField maxPassengers
+     * Maximum number of passengers in a flight.
      */
     private final int maxPassengers;
     /**
-     * Current number of passengers on Plane
-     * @serialField numPassengersOnPlane
+     * Current number of passengers on the Plane.
      */
     private int numPassengersOnPlane;
     /**
-     * Number of passengers remaining to fly do departureAirport
-     * @serialField numPassengersLeftToTransport
+     * Number of passengers remaining to fly.
      */
     private int numPassengersLeftToTransport;
-    /**
-     * @serialfield maxSleep
-     */
-    private final int maxSleep;
     
     /**
-     * Instantiation of SRDepartureAirport
-     * @param numPassengers
-     * @param minPassengers
-     * @param maxPassengers
-     * @param iRepository
+     * Instantiation of the departure airport
+     * @param numPassengers number of passengers to transport
+     * @param minPassengers minimum number of passengers in a flight
+     * @param maxPassengers maximum number of passengers in a flight
+     * @param iRepository interface of the departure airport to the reference of the repository
+     * @throws Common.MemException if it was not possible to create the FIFO
      */
     public SRDepartureAirport(int numPassengers, int minPassengers, int maxPassengers,
-                              IRepository_DepartureAirport iRepository) {
+                              IRepository_DepartureAirport iRepository) throws MemException {
         this.iRepository = iRepository;
         rl = new ReentrantLock(true);
         boarding = rl.newCondition();
@@ -134,9 +123,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         readyForBoarding = false;
         documentsShown = false;
         canEnterPlane = false;
-        try {
-            passengersQueue = new MemFIFO<>(numPassengers);
-        } catch (MemException ex) {}
+        passengersQueue = new MemFIFO<>(numPassengers);
         nextPassenger = -1;
         this.maxPassengers = maxPassengers;
         this.minPassengers = minPassengers;
@@ -145,32 +132,31 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     }
     
     /**
-     * Function used to inform the hostess that the plane is ready for boarding
-     * Hostess is signaled by the pilot
-     * @return boolean
-     * returns true when the plane is ready for boarding
+     * Operation to inform that the plane is ready for boarding.
+     * Pilot signals the Hostess to start the boarding process.
+     * @return true, if there are still passengers to transport and the  simulation continues. 
+     *         false, if there are no more passengers left to transport and the simulation ends.
      */
     @Override
     public boolean informPlaneReadyForBoarding() {
         try{
             rl.lock();
-            if(numPassengersLeftToTransport == 0){
+            if(numPassengersLeftToTransport == 0){ // Check if there are no more passengers left to transport
                 iRepository.printSumUp();
                 return false;
             }
             iRepository.setPilotState(PilotStates.RDFB);
             readyForBoarding = true;
             boarding.signal();
-        } catch(Exception ex){System.err.println("Exception occured"+ex);}
-        finally{
+        } finally{
             rl.unlock();
         }
         return true;
     }
     
     /**
-     * Function used to check documents of passenger by the hostess
-     * The hostess sends a signal to the next passenger in queue
+     * Operation to check the documents of the next passenger in queue.
+     * The hostess signals the next passenger and awaits for him to show the documents.
      */
     @Override
     public void checkDocuments() {
@@ -178,22 +164,24 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             rl.lock();
             try {
                 nextPassenger = passengersQueue.read();
-            } catch (MemException ex) {}
+            } catch (MemException ex) {System.err.println("Exception: " + ex.getMessage());}
             iRepository.setHostessState(HostessStates.CKPS, nextPassenger);
             queue[nextPassenger].signal();
             while(!documentsShown)
                 check.await();
             documentsShown = false;
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
 
     /**
-     * Hostess waits for passenger to arrive at DepartureAirport
-     * @return STHostess
-     * returns the State of Hostess after checking Documents
+     * Operation for the hostess to wait for the next passenger.
+     * The hostess signals the passenger she was checking that he can proceed to the plane and waits for him to leave.
+     * If there are no more customers in the queue and the plane is not ready to fly, the hostess waits for the next passenger.
+     * @return true, if the boarding process continues.
+     *         false, if the boarding process stopped and the plane is ready to fly.
      */
     @Override
     public boolean waitForNextPassenger() {
@@ -204,23 +192,27 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             queue[nextPassenger].signal();
             numPassengersOnPlane += 1;
             numPassengersLeftToTransport -= 1;
+            //Wait for the passenger to leave the queue.
             while(canEnterPlane)
                 pLeaving.await();
+            // Check if the plane is ready to fly
             if((passengersQueue.empty()&& numPassengersOnPlane >= minPassengers) ||
                 numPassengersOnPlane == maxPassengers || numPassengersLeftToTransport == 0)
                 return false;
+            // If there is no passengers in the queue, wait for the next passenger
             while(passengersQueue.empty())
                 passenger.await();
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
         return true;
     }
     /**
-     * The hostess waits for the plane to return from departureAirport
-     * @return true if there are still passengers left to transport
-     * false if otherwise 
+     * Operation for the hostess to wait for the next flight.
+     * The hostess waits for the plane to arrive so that the boarding process can begin.
+     * @return true, if there are still passengers to transport and the  simulation continues. 
+     *         false, if there are no more passengers left to transport and the simulation ends.
      */
     @Override
     public boolean waitForNextFlight() {
@@ -233,7 +225,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
                 boarding.await();
             numPassengersOnPlane = 0;
             readyForBoarding = false;
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
@@ -241,7 +233,8 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     }
     
     /**
-     * Hostess prepares the arrival of passengers and the boarding of the plane
+     * Operation for the Hostess to prepare for passenger boarding.
+     * If there are no customers in the queue, the hostess waits for the next passenger.
      */
     @Override
     public void prepareForPassBoarding() {
@@ -250,27 +243,17 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             iRepository.setHostessState(HostessStates.WTPS);
             while(passengersQueue.empty())
                 passenger.await();
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
    
     /**
-     * Random time for passengers to get to airport
-     * @param passengerID 
-     */
-    /*
-    @Override
-    public void travelToAirport(int passengerID) {
-        try {
-            Thread.sleep((long)(Math.random() * maxSleep));
-	} catch (InterruptedException ex) {System.err.println("Exception occured"+ex.getMessage());}
-    }
-    */
-    /**
-     * Passengers wait in queue while they are not called by the Hostess
-     * @param passengerID 
+     * Operation for the passenger to wait in the queue.
+     * If the passenger is the first on the queue, signals the hostess.
+     * The passenger waits to be called by the hostess.
+     * @param passengerID passenger id 
      */
     @Override
     public void waitInQueue(int passengerID) {
@@ -279,20 +262,22 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             iRepository.setPassengerState(PassengerStates.INQE, passengerID);
             try {
                 passengersQueue.write(passengerID);
-            } catch (MemException ex) {}
-            if(passengersQueue.getCounter()== 1) //If it was empty
+            } catch (MemException ex) {System.err.println("Exception: " + ex.getMessage());}
+            if(passengersQueue.getCounter()== 1) //If it is the first passenger on the queue, signals the hostess
                 passenger.signal();
             while(nextPassenger != passengerID)
                 queue[passengerID].await();
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }
     }
 
     /**
-     * Passenger shows documents to Hostess
-     * @param passengerID 
+     * Operation for the passenger show the documents.
+     * The passenger signals the hostess to show the documents.
+     * Then, waits for the hostess to check the documents.
+     * @param passengerID passenger id
      */
     @Override
     public void showDocuments(int passengerID) {
@@ -304,7 +289,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
                 queue[passengerID].await();
             canEnterPlane = false;
             pLeaving.signal();
-        } catch(InterruptedException ex){System.err.println("Exception occured"+ex.getMessage());}
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
         }

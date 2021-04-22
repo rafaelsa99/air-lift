@@ -6,45 +6,40 @@ import DestinationAirport.IDestinationAirport_Passenger;
 import Plane.IPlane_Passenger;
 
 /**
- *
+ * Passenger thread, which simulates the Passenger life cycle.
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AEPassenger extends Thread{
     
     /**
-     * iDepartureAirport
-     * @serialField IDepartureAirport_Passenger
+     * Interface of the Passenger to the reference of the Departure Airport.
      */
     private final IDepartureAirport_Passenger iDepartureAirport;
     /**
-     * iDestinationAirport
-     * @serialField IDestinationAirport_Passenger
+     * Interface of the Passenger to the reference of the Destination Airport.
      */
     private final IDestinationAirport_Passenger iDestinationAirport;
     /**
-     * Plane
-     * @serialField IPlane_Passenger
+     * Interface of the Passenger to the reference of the Plane.
      */
     private final IPlane_Passenger iPlane;
     /**
-     * Passenger states
-     * @serialField STPassenger
+     * Maximum sleeping time, in milliseconds.
      */
-    //private STPassenger stPassenger;
     private final int maxSleep;
-    
     /**
-     * Passenger's id 
-     * @serialField id
+     * Passenger identification.
      */
     private final int id;
+    
     /**
-     * Passenger instantiation
+     * Instantiation of a Passenger thread.
      * 
-     * @param pDepartureAirport_passenger   Departure Airport shared region  
-     * @param pDestinationAirport_passenger Destination Airport shared region  
-     * @param pPlane_passenger              Plane shared region              
-     * @param id                            Passenger's Id 
+     * @param pDepartureAirport_passenger interface of the Passenger to the reference of the Departure Airport  
+     * @param pDestinationAirport_passenger interface of the Passenger to the reference of the Destination Airport 
+     * @param pPlane_passenger interface of the Passenger to the reference of the Plane            
+     * @param id passenger Id
+     * @param maxSleep maximum sleeping time (ms)
      */
     public AEPassenger(IDepartureAirport_Passenger pDepartureAirport_passenger,
                        IDestinationAirport_Passenger pDestinationAirport_passenger,
@@ -58,20 +53,25 @@ public class AEPassenger extends Thread{
         this.maxSleep = maxSleep;
     }
     /**
-     * Returns this Passenger's id.
-     * @return Passenger's id
+     * Get passenger ID.
+     * @return passenger id
      */
     public int getPassengerID() {
             return id;
     }
     
-
+    /**
+     * Get maximum sleeping time.
+     * @return maximum sleeping time
+     */
     public int getMaxSleep() {
         return maxSleep;
     }
+    
     /**
-     * Passenger's lifecycle
+     * Life cycle of the Passenger.
      */
+    @Override
     public void run(){
         travelToAirport();
         iDepartureAirport.waitInQueue(id);
@@ -82,6 +82,10 @@ public class AEPassenger extends Thread{
         iPlane.leaveThePlane(id);
     }
     
+    /**
+     * Passenger traveling to the airport.
+     * The thread sleeps for a random period of time, for a maximum o maxSleep time.
+     */
     private void travelToAirport() {
         try {
             Thread.sleep((long)(Math.random() * maxSleep));

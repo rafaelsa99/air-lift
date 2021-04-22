@@ -5,31 +5,24 @@ import DepartureAirport.IDepartureAirport_Pilot;
 import Plane.IPlane_Pilot;
 
 /**
- *
+ * Pilot thread, which simulates the pilot life cycle.
  * @author Rafael Sá (104552), José Brás (74029)
  */
 public class AEPilot extends Thread{
     
-    //Shared Regions
     /**
-     * iDepartureAirport shared region for Pilot
-     * @serialField iDepartureAirport
+     * Interface of the pilot to the reference of the Departure Airport.
      */
     private final IDepartureAirport_Pilot iDepartureAirport;
     /**
-     * iPlane shared region for Pilot
-     * @serialField iPlane
+     * Interface of the pilot to the reference of the Plane.
      */
     private final IPlane_Pilot iPlane;
-    /**
-     * 
-     */
 
-    
     /**
-     * Pilot Instantiation
-     * @param iDepartureAirport
-     * @param iPlane 
+     * Instantiation of a Passenger thread.
+     * @param iDepartureAirport interface of the pilot to the reference of the Departure Airport
+     * @param iPlane interface of the pilot to the reference of the Plane
      */
     public AEPilot(IDepartureAirport_Pilot iDepartureAirport, IPlane_Pilot iPlane) {
         super("Pilot");
@@ -38,8 +31,7 @@ public class AEPilot extends Thread{
     }
 
     /**
-     * Pilot's lifecycle
-     * 
+     * Life cycle of the pilot.
      */
     @Override
     public void run() {   
