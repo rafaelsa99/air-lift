@@ -35,14 +35,16 @@ public class AEHostess extends Thread{
      */
     @Override
     public void run(){
+        int passengersOnFlight;
         while(true){
             if(!iDepartureAirport.waitForNextFlight())
                 break;
             iDepartureAirport.prepareForPassBoarding();
             do{
                 iDepartureAirport.checkDocuments();
-            }while(iDepartureAirport.waitForNextPassenger());
-            iPlane.informPlaneReadyToTakeOff();
+                passengersOnFlight = iDepartureAirport.waitForNextPassenger();
+            }while(passengersOnFlight == -1);
+            iPlane.informPlaneReadyToTakeOff(passengersOnFlight);
         }
     }   
 }

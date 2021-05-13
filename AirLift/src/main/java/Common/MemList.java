@@ -101,4 +101,13 @@ public class MemList<R> extends MemObject<R> {
     public boolean empty () {
         return count == 0;
     }
+
+    /**
+     * Get the number of items in the list.
+     * @return the current number of items
+     */
+    public int getCount() {
+        return count;
+    }
+    
 }

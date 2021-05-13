@@ -34,6 +34,12 @@ public class SRPlane implements IPlane_Pilot,
      */
     private final Condition takeOff;
     /**
+     * Condition for the hostess wait for all passengers to be on the plane.
+     * Sender: Passenger signals
+     * Receiver: Hostess is signaled
+     */
+    private final Condition incomingPassengers;
+    /**
      * Condition for while passenger deboarding is in progress.
      * Sender: Last passenger to leave the plane signals
      * Receiver: Pilot is signaled
@@ -77,6 +83,7 @@ public class SRPlane implements IPlane_Pilot,
         this.iRepository = iRepository;
         rl = new ReentrantLock(true);
         takeOff = rl.newCondition();
+        incomingPassengers = rl.newCondition();
         deboarding = rl.newCondition();
         flight = new Condition[numPassengers];
         for (int i = 0; i < numPassengers; i++)
@@ -161,15 +168,19 @@ public class SRPlane implements IPlane_Pilot,
     /**
      * Operation for the hostess to inform that the plane is ready to take off.
      * The hostess signals the pilot to start the flight.
+     * @param numPassengersOnPlane number of passengers that must be on plane before allow the take off
      */
     @Override
-    public void informPlaneReadyToTakeOff() {
+    public void informPlaneReadyToTakeOff(int numPassengersOnPlane) {
         try{
             rl.lock();
+            while(passengersOnPlane.getCount() < numPassengersOnPlane)
+               incomingPassengers.await();
             iRepository.setHostessState(HostessStates.RDTF);
             readyTakeOff = true;
             takeOff.signal();
-        } finally{
+        } catch(InterruptedException ex){System.err.println("Exception: " + ex.getMessage());} 
+        finally{
             rl.unlock();
         }
     }
@@ -185,6 +196,7 @@ public class SRPlane implements IPlane_Pilot,
             rl.lock();
             iRepository.setPassengerState(PassengerStates.INFL, passengerID);
             passengersOnPlane.write(passengerID);
+            incomingPassengers.signal();
         } catch(MemException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();

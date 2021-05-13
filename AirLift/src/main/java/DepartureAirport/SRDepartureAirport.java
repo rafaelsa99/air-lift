@@ -180,11 +180,11 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * Operation for the hostess to wait for the next passenger.
      * The hostess signals the passenger she was checking that he can proceed to the plane and waits for him to leave.
      * If there are no more customers in the queue and the plane is not ready to fly, the hostess waits for the next passenger.
-     * @return true, if the boarding process continues.
-     *         false, if the boarding process stopped and the plane is ready to fly.
+     * @return the number of passengers on the plane.
+     *         -1, if the boarding procedure is still ongoing.
      */
     @Override
-    public boolean waitForNextPassenger() {
+    public int waitForNextPassenger() {
         try{
             rl.lock();
             iRepository.setHostessState(HostessStates.WTPS);
@@ -198,7 +198,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             // Check if the plane is ready to fly
             if((passengersQueue.empty()&& numPassengersOnPlane >= minPassengers) ||
                 numPassengersOnPlane == maxPassengers || numPassengersLeftToTransport == 0)
-                return false;
+                return numPassengersOnPlane;
             // If there is no passengers in the queue, wait for the next passenger
             while(passengersQueue.empty())
                 passenger.await();
@@ -206,7 +206,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         finally{
             rl.unlock();
         }
-        return true;
+        return -1;
     }
     /**
      * Operation for the hostess to wait for the next flight.

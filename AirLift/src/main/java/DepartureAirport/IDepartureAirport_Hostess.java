@@ -15,10 +15,10 @@ public interface IDepartureAirport_Hostess {
      * Operation for the hostess to wait for the next passenger.
      * The hostess signals the passenger she was checking that he can proceed to the plane and waits for him to leave.
      * If there are no more customers in the queue and the plane is not ready to fly, the hostess waits for the next passenger.
-     * @return true, if the boarding process continues.
-     *         false, if the boarding process stopped and the plane is ready to fly.
+     * @return the number of passengers on the plane.
+     *         -1, if the boarding procedure is still ongoing.
      */
-    public boolean waitForNextPassenger();
+    public int waitForNextPassenger();
     /**
      * Operation for the hostess to wait for the next flight.
      * The hostess waits for the plane to arrive so that the boarding process can begin.
