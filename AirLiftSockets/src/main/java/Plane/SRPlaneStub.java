@@ -1,9 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Plane;
+
+import Common.ClientCom;
+import Common.Message;
+import Common.MessageTypes;
 
 /**
  *
@@ -21,54 +21,108 @@ public class SRPlaneStub implements IPlane_Pilot,
     */
     private int serverPort;
 
+    private ClientCom clientCom;
 
     public SRPlaneStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
+        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
 
     @Override
     public void waitForAllInBoard() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.P_WTFB);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void flyToDestinationPoint() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.P_FDES);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void announceArrival() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.P_ANAR);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void flyToDeparturePoint() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        Message outMessage = new Message(MessageTypes.P_FDEP);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }    }
 
     @Override
     public void parkAtTransferGate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.P_PATG);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void informPlaneReadyToTakeOff(int numPassengersOnPlane) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.H_PRTO, numPassengersOnPlane);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void boardThePlane(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_BTP, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void waitForEndOfFlight(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_EOF, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void leaveThePlane(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_LTP, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+    }
+    
+    private Message sendMessageAndWaitForReply(Message outMessage){
+        clientCom.open();
+        clientCom.writeObject(outMessage);
+        Message inMessage = (Message) clientCom.readObject();
+        clientCom.close();
+        return inMessage;
     }
 }

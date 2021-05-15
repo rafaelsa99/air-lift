@@ -1,5 +1,9 @@
 package DepartureAirport;
 
+import Common.ClientCom;
+import Common.Message;
+import Common.MessageTypes;
+
 
 public class SRDepartureAirportStub implements IDepartureAirport_Hostess, 
                                                IDepartureAirport_Passenger, 
@@ -13,44 +17,92 @@ public class SRDepartureAirportStub implements IDepartureAirport_Hostess,
     */
     private int serverPort;
 
+    private ClientCom clientCom;
         
     public SRDepartureAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
+        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
 
     @Override
     public void checkDocuments() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.H_CHKD);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public int waitForNextPassenger() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.H_WTPS);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+        return inMessage.getiParam1();
     }
 
     @Override
     public boolean waitForNextFlight() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.H_WTFL);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+        return inMessage.getbParam();
     }
 
     @Override
     public void prepareForPassBoarding() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.H_PBRD);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void waitInQueue(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_WIQ, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void showDocuments(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_SHD, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public boolean informPlaneReadyForBoarding() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.P_PRFB);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+        return inMessage.getbParam();
+    }
+    
+    private Message sendMessageAndWaitForReply(Message outMessage){
+        clientCom.open();
+        clientCom.writeObject(outMessage);
+        Message inMessage = (Message) clientCom.readObject();
+        clientCom.close();
+        return inMessage;
     }
 }

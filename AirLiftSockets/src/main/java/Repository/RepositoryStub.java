@@ -1,9 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Repository;
+
+import Common.ClientCom;
+import Common.Message;
+import Common.MessageTypes;
 
 /**
  *
@@ -21,35 +21,70 @@ public class RepositoryStub implements IRepository_DepartureAirport,
     * Repository server port.
     */
     private int serverPort;
+    
+    private ClientCom clientCom;
 
     public RepositoryStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
+        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     
     @Override
     public void setPilotState(int stPilot) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.R_PIST, stPilot);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void setHostessState(int stHostess) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.R_HST1, stHostess);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void setHostessState(int stHostess, int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.R_HST2, stHostess, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void setPassengerState(int stPassenger, int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.R_PSST, stPassenger, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
 
     @Override
     public void printSumUp() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.R_SUMP);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
     }
     
+    private Message sendMessageAndWaitForReply(Message outMessage){
+        clientCom.open();
+        clientCom.writeObject(outMessage);
+        Message inMessage = (Message) clientCom.readObject();
+        clientCom.close();
+        return inMessage;
+    }
 }

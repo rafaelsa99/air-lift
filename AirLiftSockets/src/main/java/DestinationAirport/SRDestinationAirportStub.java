@@ -1,9 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DestinationAirport;
+
+import Common.ClientCom;
+import Common.Message;
+import Common.MessageTypes;
 
 /**
  *
@@ -19,13 +19,29 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     */
     private int serverPort;
 
+    private ClientCom clientCom;
+            
     public SRDestinationAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
+        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     
     @Override
     public void leaveThePlane(int passengerID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Message outMessage = new Message(MessageTypes.PS_LTP, passengerID);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+    }
+    
+    private Message sendMessageAndWaitForReply(Message outMessage){
+        clientCom.open();
+        clientCom.writeObject(outMessage);
+        Message inMessage = (Message) clientCom.readObject();
+        clientCom.close();
+        return inMessage;
     }
 }

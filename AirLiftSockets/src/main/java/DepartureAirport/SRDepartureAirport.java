@@ -11,8 +11,6 @@ import Repository.IRepository_DepartureAirport;
 import Repository.RepositoryStub;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Departure Airport.
