@@ -6,7 +6,9 @@ import ActiveEntity.PassengerStates;
 import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemList;
+import Main.Parameters;
 import Repository.IRepository_Plane;
+import Repository.RepositoryStub;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -236,6 +238,69 @@ public class SRPlane implements IPlane_Pilot,
         } catch(MemException ex){System.err.println("Exception: " + ex.getMessage());}
         finally{
             rl.unlock();
+        }
+    }
+    
+    public static void main(String[] args) {
+        if((args.length % 2) != 0){
+            System.out.println("Optional arguments: "
+                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
+                    + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
+                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in milliseconds (Default = " + Parameters.MAX_SLEEP + ")"
+                    + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")");
+            throw new IllegalArgumentException("Invalid Arguments");
+        }
+        String proxyHostname = Parameters.SERVER_HOSTNAME;
+        int proxyPort = Parameters.PLANE_SERVER_PORT; 
+        String repositoryHostname = Parameters.SERVER_HOSTNAME;
+        int repositoryPort = Parameters.REPOSITORY_SERVER_PORT; 
+        int numPassenger = Parameters.NUM_PASSENGER; 
+        int maxSleep = Parameters.MAX_SLEEP; 
+        try{
+            for (int i = 0; i < args.length; i+=2) {
+                switch(args[i].toLowerCase()){
+                    case "-sh": proxyHostname = args[i+1];
+                               break;
+                    case "-sp": proxyPort = Integer.valueOf(args[i+1]);
+                               break;
+                    case "-rh": repositoryHostname = args[i+1];
+                               break;
+                    case "-rp": repositoryPort = Integer.valueOf(args[i+1]);
+                               break;
+                    case "-p": numPassenger = Integer.valueOf(args[i+1]);
+                               break;
+                    case "-s": maxSleep = Integer.valueOf(args[i+1]);
+                               break;
+                    default: throw new IllegalArgumentException();
+                }
+            }
+        } catch(IllegalArgumentException ex){
+            System.out.println("Optional arguments: "
+                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
+                    + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
+                    + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in milliseconds (Default = " + Parameters.MAX_SLEEP + ")"
+                    + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")");
+            throw new IllegalArgumentException("Invalid Arguments");
+        }
+        RepositoryStub repositoryStub = new RepositoryStub(repositoryHostname, repositoryPort);
+        try {
+            SRPlane srPlane = new SRPlane(numPassenger,
+                    (IRepository_Plane) repositoryStub, maxSleep);
+            PlaneProxy planeProxy = new PlaneProxy(srPlane);
+            System.out.println("Plane server proxy agent started!");
+            planeProxy.start();
+            try{
+                planeProxy.join();
+            }catch(InterruptedException ex){
+                System.out.println(ex.getMessage());
+            }
+            System.out.println("Plane server proxy agent ended!");
+        } catch (MemException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }

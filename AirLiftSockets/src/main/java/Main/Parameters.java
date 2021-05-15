@@ -27,6 +27,26 @@ public class Parameters {
      * Maximum sleeping time, in milliseconds.
      */
     public static final int MAX_SLEEP = 1000;
+    /**
+     * Server host name.
+     */
+    public static final String SERVER_HOSTNAME = "localhost";
+    /**
+     * Departure Airport server port.
+     */
+    public static final int DEPARTURE_AIRPORT_SERVER_PORT = 9001;
+    /**
+     * Destination Airport server port.
+     */
+    public static final int DESTINATION_AIRPORT_SERVER_PORT = 9002;
+    /**
+     * Plane server port.
+     */
+    public static final int PLANE_SERVER_PORT = 9003;
+    /**
+     * General Repository server port.
+     */
+    public static final int REPOSITORY_SERVER_PORT = 9004;
       
     /**
      * It can not be instantiated.
