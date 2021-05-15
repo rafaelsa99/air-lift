@@ -300,7 +300,6 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     public static void main(String[] args) {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "
-                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
@@ -309,7 +308,6 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
                     + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")");
             throw new IllegalArgumentException("Invalid Arguments");
         }
-        String proxyHostname = Parameters.SERVER_HOSTNAME;
         int proxyPort = Parameters.DEPARTURE_AIRPORT_SERVER_PORT; 
         String repositoryHostname = Parameters.SERVER_HOSTNAME;
         int repositoryPort = Parameters.REPOSITORY_SERVER_PORT; 
@@ -319,8 +317,6 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         try{
             for (int i = 0; i < args.length; i+=2) {
                 switch(args[i].toLowerCase()){
-                    case "-sh": proxyHostname = args[i+1];
-                               break;
                     case "-sp": proxyPort = Integer.valueOf(args[i+1]);
                                break;
                     case "-rh": repositoryHostname = args[i+1];
@@ -338,7 +334,6 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             }
         } catch(IllegalArgumentException ex){
             System.out.println("Optional arguments: "
-                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
@@ -349,9 +344,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         }
         RepositoryStub repositoryStub = new RepositoryStub(repositoryHostname, repositoryPort);
         try {
-            SRDepartureAirport srDepartureAirport = new SRDepartureAirport(numPassenger, minPassenger, maxPassenger,
-                    (IRepository_DepartureAirport) repositoryStub);
-            DepartureAirportProxy departureAirportProxy = new DepartureAirportProxy(srDepartureAirport);
+            SRDepartureAirportInterface srDepartureAirport = new SRDepartureAirportInterface(
+                    new SRDepartureAirport(numPassenger, minPassenger, maxPassenger,
+                                          (IRepository_DepartureAirport) repositoryStub));
+            DepartureAirportProxy departureAirportProxy = new DepartureAirportProxy(srDepartureAirport, proxyPort);
             System.out.println("Departure airport server proxy agent started!");
             departureAirportProxy.start();
             try{

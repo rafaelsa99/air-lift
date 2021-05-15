@@ -1,5 +1,5 @@
 
-package Common;
+package Communication;
 import java.io.*;
 import java.net.*;
 

@@ -1,9 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package DestinationAirport;
+
+import Communication.Message;
+import Communication.ServerCom;
 
 /**
  *
@@ -11,9 +10,35 @@ package DestinationAirport;
  */
 public class DestinationAirportProxy extends Thread{
     
-    SRDestinationAirport sRDestinationAirport;
+    private final SRDestinationAirportInterface sRDestinationAirport;
+    private final ServerCom serverCom;
 
-    public DestinationAirportProxy(SRDestinationAirport sRDestinationAirport) {
+    public DestinationAirportProxy(SRDestinationAirportInterface sRDestinationAirport, int port) {
         this.sRDestinationAirport = sRDestinationAirport;
+        this.serverCom = new ServerCom(port);
+    }
+    
+    @Override
+    public void run() {
+        serverCom.start();
+        while(true)
+            new ProxyAgent(serverCom.accept()).start();
+    }
+
+    class ProxyAgent extends Thread{
+        
+        private final ServerCom socket;
+
+        public ProxyAgent(ServerCom socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            Message inMessage = (Message)socket.readObject();
+            Message outMessage = sRDestinationAirport.processAndReply(inMessage);
+            socket.writeObject(outMessage);
+            socket.close();
+        } 
     }
 }

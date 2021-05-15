@@ -244,7 +244,6 @@ public class SRPlane implements IPlane_Pilot,
     public static void main(String[] args) {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "
-                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
@@ -252,7 +251,6 @@ public class SRPlane implements IPlane_Pilot,
                     + "\n\t-p <NUM_PASSENGERS>: Number of passengers (Default = " + Parameters.NUM_PASSENGER + ")");
             throw new IllegalArgumentException("Invalid Arguments");
         }
-        String proxyHostname = Parameters.SERVER_HOSTNAME;
         int proxyPort = Parameters.PLANE_SERVER_PORT; 
         String repositoryHostname = Parameters.SERVER_HOSTNAME;
         int repositoryPort = Parameters.REPOSITORY_SERVER_PORT; 
@@ -261,8 +259,6 @@ public class SRPlane implements IPlane_Pilot,
         try{
             for (int i = 0; i < args.length; i+=2) {
                 switch(args[i].toLowerCase()){
-                    case "-sh": proxyHostname = args[i+1];
-                               break;
                     case "-sp": proxyPort = Integer.valueOf(args[i+1]);
                                break;
                     case "-rh": repositoryHostname = args[i+1];
@@ -278,7 +274,6 @@ public class SRPlane implements IPlane_Pilot,
             }
         } catch(IllegalArgumentException ex){
             System.out.println("Optional arguments: "
-                    + "\n\t-sh <SERVER_PROXY_HOSTNAME>: Server Proxy Agent Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")"
@@ -288,9 +283,9 @@ public class SRPlane implements IPlane_Pilot,
         }
         RepositoryStub repositoryStub = new RepositoryStub(repositoryHostname, repositoryPort);
         try {
-            SRPlane srPlane = new SRPlane(numPassenger,
-                    (IRepository_Plane) repositoryStub, maxSleep);
-            PlaneProxy planeProxy = new PlaneProxy(srPlane);
+            SRPlaneInterface srPlane = new SRPlaneInterface(new SRPlane(numPassenger,
+                                            (IRepository_Plane) repositoryStub, maxSleep));
+            PlaneProxy planeProxy = new PlaneProxy(srPlane, proxyPort);
             System.out.println("Plane server proxy agent started!");
             planeProxy.start();
             try{

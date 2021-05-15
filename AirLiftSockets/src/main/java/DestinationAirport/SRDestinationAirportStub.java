@@ -1,9 +1,9 @@
 
 package DestinationAirport;
 
-import Common.ClientCom;
-import Common.Message;
-import Common.MessageTypes;
+import Communication.ClientCom;
+import Communication.Message;
+import Communication.MessageTypes;
 
 /**
  *
