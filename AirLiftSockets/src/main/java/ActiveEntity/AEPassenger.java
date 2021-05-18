@@ -172,6 +172,7 @@ public class AEPassenger extends Thread{
         }catch(InterruptedException ex){
             System.out.println(ex.getMessage());
         }
+        srDestinationAirportStub[0].end();
         System.out.println("Passenger threads ended!");
     }
 }

@@ -118,6 +118,15 @@ public class SRPlaneStub implements IPlane_Pilot,
         }
     }
     
+    public void end(){
+        Message outMessage = new Message(MessageTypes.END);
+        Message inMessage = sendMessageAndWaitForReply(outMessage);
+        if(inMessage.getMessageType() != MessageTypes.RSP_OK){
+            System.out.println("Error on the reply received from the shared region!");
+            System.exit (1);
+        }
+    }
+    
     private Message sendMessageAndWaitForReply(Message outMessage){
         clientCom.open();
         clientCom.writeObject(outMessage);

@@ -136,10 +136,8 @@ public class ServerCom
       { scon.commSocket = listeningSocket.accept();
       }
       catch (SocketException e)
-      { System.out.println(Thread.currentThread ().getName () +
-                                 " - the listening socket was closed during the listening process!");
-        e.printStackTrace ();
-        System.exit (1);
+      { 
+        return null;
       }
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +

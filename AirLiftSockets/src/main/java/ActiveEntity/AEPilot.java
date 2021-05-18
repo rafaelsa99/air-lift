@@ -95,6 +95,8 @@ public class AEPilot extends Thread{
         }catch(InterruptedException ex){
             System.out.println(ex.getMessage());
         }
+        srDepartureAirportStub.end();
+        srPlaneStub.end();
         System.out.println("Pilot thread ended!");
     }
 }

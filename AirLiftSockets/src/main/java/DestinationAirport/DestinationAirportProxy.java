@@ -2,6 +2,7 @@
 package DestinationAirport;
 
 import Communication.Message;
+import Communication.MessageTypes;
 import Communication.ServerCom;
 
 /**
@@ -21,8 +22,9 @@ public class DestinationAirportProxy extends Thread{
     @Override
     public void run() {
         serverCom.start();
-        while(true)
-            new ProxyAgent(serverCom.accept()).start();
+        ServerCom socket;
+        while((socket = serverCom.accept()) != null)
+            new ProxyAgent(socket).start();
     }
 
     class ProxyAgent extends Thread{
@@ -36,7 +38,12 @@ public class DestinationAirportProxy extends Thread{
         @Override
         public void run() {
             Message inMessage = (Message)socket.readObject();
-            Message outMessage = sRDestinationAirport.processAndReply(inMessage);
+            Message outMessage;
+            if(inMessage.getMessageType() == MessageTypes.END){
+                serverCom.end();
+                outMessage = new Message(MessageTypes.RSP_OK);
+            } else
+                outMessage = sRDestinationAirport.processAndReply(inMessage);
             socket.writeObject(outMessage);
             socket.close();
         } 

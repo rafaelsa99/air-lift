@@ -355,6 +355,7 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
             }catch(InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
+            repositoryStub.end();
             System.out.println("Departure airport server proxy agent ended!");
         } catch (MemException ex) {
             System.out.println(ex.getMessage());

@@ -30,6 +30,7 @@ public class MessageTypes {
     public static final int R_SUMP = 20;
     public static final int R_HST1 = 21;
     public static final int R_HST2 = 22;
+    public static final int END = 23;
     
     private MessageTypes() {}
 }
