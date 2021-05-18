@@ -9,11 +9,14 @@ import Repository.IRepository_Plane;
 import Repository.RepositoryStub;
 
 /**
- *
- * @author rafael
+ * Simulation of the air lift problem - Plane Main.
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class PlaneMain {
-    
+    /**
+     * Main method.
+     * @param args program arguments
+     */
     public static void main(String[] args) {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "

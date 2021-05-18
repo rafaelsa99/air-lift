@@ -5,17 +5,30 @@ import Communication.Message;
 import Communication.MessageTypes;
 
 /**
- *
- * @author rafael
+ * Interface to the shared region of the departure airport.
+ * Responsible to process a request and generate the reply message.
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class SRDepartureAirportInterface {
     
+    /**
+     * Shared region of the departure airport.
+     */
     private final SRDepartureAirport srDepartureAirport;
 
+    /**
+     * Departure Airport interface instantiation.
+     * @param srDepartureAirport shared region of the departure airport
+     */
     public SRDepartureAirportInterface(SRDepartureAirport srDepartureAirport) {
         this.srDepartureAirport = srDepartureAirport;
     }
     
+    /**
+     * Process a request and generate the reply message.
+     * @param inMessage message received with the request
+     * @return the reply message
+     */
     public Message processAndReply(Message inMessage){
         Message outMessage;
         switch(inMessage.getMessageType()){

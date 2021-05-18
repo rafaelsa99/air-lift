@@ -6,8 +6,8 @@ import Communication.Message;
 import Communication.MessageTypes;
 
 /**
- *
- * @author jcpbr
+ * Stub for the shared region of the destination airport.
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     /**
@@ -18,15 +18,26 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     * Destination Airport server port.
     */
     private final int serverPort;
-
+    /**
+     * Client communications manager.
+     */
     private final ClientCom clientCom;
-            
+        
+    /**
+     * Stub of the shared region of the destination airport instantiation.
+     * @param serverHostName destination airport server host name
+     * @param serverPort destination airport server port
+     */    
     public SRDestinationAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
         this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     
+    /**
+     * Operation to indicate that the passenger left the plane and arrived at the destination airport.
+     * @param passengerID passenger id
+     */
     @Override
     public void leaveThePlane(int passengerID) {
         Message outMessage = new Message(MessageTypes.PS_LTP, passengerID);
@@ -37,6 +48,10 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
         }
     }
     
+    /**
+     * End of the simulation.
+     * Shutdown of the shared region of the destination airport.
+     */
     public void end(){
         Message outMessage = new Message(MessageTypes.END);
         Message inMessage = sendMessageAndWaitForReply(outMessage);
@@ -45,7 +60,11 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
             System.exit (1);
         }
     }
-    
+    /**
+     * Send a message to the shared region and wait for the reply.
+     * @param outMessage message to be sent
+     * @return the message replied by the shared region
+     */
     private Message sendMessageAndWaitForReply(Message outMessage){
         clientCom.open();
         clientCom.writeObject(outMessage);

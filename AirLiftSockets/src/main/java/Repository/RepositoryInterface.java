@@ -5,17 +5,28 @@ import Communication.Message;
 import Communication.MessageTypes;
 
 /**
- *
- * @author rafael
+ * Interface to the shared region of the general repository.
+ * Responsible to process a request and generate the reply message.
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class RepositoryInterface {
-    
+    /**
+     * Shared region of the general repository.
+     */
     private final Repository repository;
-
+    
+    /**
+     * General Repository interface instantiation.
+     * @param repository shared region of the general repository
+     */
     public RepositoryInterface(Repository repository) {
         this.repository = repository;
     }
-    
+    /**
+     * Process a request and generate the reply message.
+     * @param inMessage message received with the request
+     * @return the reply message
+     */
     public Message processAndReply(Message inMessage){
         Message outMessage;
         switch(inMessage.getMessageType()){

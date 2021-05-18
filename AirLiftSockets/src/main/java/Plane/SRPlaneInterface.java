@@ -5,17 +5,29 @@ import Communication.Message;
 import Communication.MessageTypes;
 
 /**
- *
- * @author rafael
+ * Interface to the shared region of the plane.
+ * Responsible to process a request and generate the reply message.
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class SRPlaneInterface {
     
+    /**
+     * Shared region of the plane.
+     */
     private final SRPlane srPlane;
 
+    /**
+     * Plane interface instantiation.
+     * @param srPlane shared region of the plane
+     */
     public SRPlaneInterface(SRPlane srPlane) {
         this.srPlane = srPlane;
     }
-    
+    /**
+     * Process a request and generate the reply message.
+     * @param inMessage message received with the request
+     * @return the reply message
+     */
     public Message processAndReply(Message inMessage){
         Message outMessage;
         switch(inMessage.getMessageType()){
