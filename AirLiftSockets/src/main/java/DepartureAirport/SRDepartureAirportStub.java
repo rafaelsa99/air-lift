@@ -11,13 +11,13 @@ public class SRDepartureAirportStub implements IDepartureAirport_Hostess,
     /**
     * DepartureAirport server host name.
     */
-    private String serverHostName;
+    private final String serverHostName;
     /**
     * DepartureAirport server port.
     */
-    private int serverPort;
+    private final int serverPort;
 
-    private ClientCom clientCom;
+    private final ClientCom clientCom;
         
     public SRDepartureAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;

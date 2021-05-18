@@ -33,7 +33,7 @@ public class ServerCom
    *  Number of the listening port at the computational system where the server is located.
    */
 
-   private int serverPortNumb;
+   private final int serverPortNumb;
 
   /**
    *  Input stream of the communication channel.
@@ -86,14 +86,12 @@ public class ServerCom
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible the association of the listening socket to the port: " +
                                  serverPortNumb + "!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (IOException e)                                // fatal error --- other reasons
       { System.out.println(Thread.currentThread ().getName () +
                                  " - an indeterminate error has occurred in establishing the connection at: " +
                                  serverPortNumb + "!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }
@@ -112,7 +110,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the listening socket!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }
@@ -142,7 +139,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to instantiate a communication channel for the pending request!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -152,7 +148,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to open the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -162,7 +157,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to open the output stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -184,7 +178,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -194,7 +187,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the output stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -204,7 +196,6 @@ public class ServerCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the communication socket!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }
@@ -225,19 +216,16 @@ public class ServerCom
       catch (InvalidClassException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the read object could not be deserialized!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - error on reading an object from the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (ClassNotFoundException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the read object belongs to an unknown data type!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -258,19 +246,16 @@ public class ServerCom
       catch (InvalidClassException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the object to be written can not be serialized!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (NotSerializableException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the object to be written does not implement the Serializable interface!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - error on writing an object to the output stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }

@@ -27,13 +27,13 @@ public class ClientCom
    *  Name of the computational system where the server is located.
    */
 
-   private String serverHostName;
+   private final String serverHostName;
 
   /**
    *  Number of the listening port at the computational system where the server is located.
    */
 
-   private int serverPortNumb;
+   private final int serverPortNumb;
 
   /**
    *  Input stream of the communication channel.
@@ -84,14 +84,12 @@ public class ClientCom
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the name of the computational system where the server is located, is unknown: " +
                                  serverHostName + "!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (NoRouteToHostException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the name of the computational system where the server is located, is unreachable: " +
                                  serverHostName + "!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (ConnectException e)
@@ -100,7 +98,6 @@ public class ClientCom
         if (e.getMessage ().equals ("Connection refused"))
            success = false;
            else { System.out.println(e.getMessage () + "!");
-                  e.printStackTrace ();
                   System.exit (1);
                 }
       }
@@ -114,7 +111,6 @@ public class ClientCom
       { System.out.println(Thread.currentThread ().getName () +
                                  " - an indeterminate error has occurred in establishing the connection at: " +
                                  serverHostName + "." + serverPortNumb + "!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -126,7 +122,6 @@ public class ClientCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to open the output stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -136,7 +131,6 @@ public class ClientCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to open the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -158,7 +152,6 @@ public class ClientCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the output stream!!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -168,7 +161,6 @@ public class ClientCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -178,7 +170,6 @@ public class ClientCom
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - it was not possible to close the communication socket!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }
@@ -199,19 +190,16 @@ public class ClientCom
       catch (InvalidClassException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the read object could not be deserialized!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - error on reading an object from the input stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (ClassNotFoundException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the read object belongs to an unknown data type!");
-        e.printStackTrace ();
         System.exit (1);
       }
 
@@ -232,19 +220,16 @@ public class ClientCom
       catch (InvalidClassException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the object to be written can not be serialized!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (NotSerializableException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - the object to be written does not implement the Serializable interface!");
-        e.printStackTrace ();
         System.exit (1);
       }
       catch (IOException e)
       { System.out.println(Thread.currentThread ().getName () +
                                  " - error on writing an object to the output stream!");
-        e.printStackTrace ();
         System.exit (1);
       }
    }

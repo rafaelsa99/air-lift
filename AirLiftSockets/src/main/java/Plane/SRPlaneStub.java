@@ -15,13 +15,13 @@ public class SRPlaneStub implements IPlane_Pilot,
    /**
     * Plane server host name.
     */
-    private String serverHostName;
+    private final String serverHostName;
     /**
     * Plane server port.
     */
-    private int serverPort;
+    private final int serverPort;
 
-    private ClientCom clientCom;
+    private final ClientCom clientCom;
 
     public SRPlaneStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;

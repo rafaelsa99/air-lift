@@ -1,12 +1,17 @@
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Communication/package-info.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/PassengerMain.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/DepartureAirportMain.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Common/MemException.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/ActiveEntity/AEPilot.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DestinationAirport/package-info.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/HostessMain.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Common/package-info.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Plane/SRPlaneStub.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/SRDepartureAirportInterface.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DestinationAirport/SRDestinationAirportInterface.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DestinationAirport/SRDestinationAirport.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/DestinationAirportMain.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/PilotMain.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/ActiveEntity/PilotStates.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Plane/PlaneProxy.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/IDepartureAirport_Passenger.java
@@ -17,6 +22,7 @@
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Plane/IPlane_Pilot.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/IDepartureAirport_Pilot.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/DepartureAirportProxy.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/RepositoryMain.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Common/MemList.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/package-info.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Communication/ClientCom.java
@@ -42,8 +48,8 @@
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/package-info.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Repository/package-info.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/IDepartureAirport_Hostess.java
-/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/AirLift.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/Parameters.java
+/home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/Main/PlaneMain.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/ActiveEntity/AEHostess.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DepartureAirport/SRDepartureAirport.java
 /home/rafael/Desktop/TP_SD/air-lift/AirLiftSockets/src/main/java/DestinationAirport/DestinationAirportProxy.java

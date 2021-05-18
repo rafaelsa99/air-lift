@@ -13,13 +13,13 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     /**
     * Destination Airport server host name.
     */
-    private String serverHostName;
+    private final String serverHostName;
     /**
     * Destination Airport server port.
     */
-    private int serverPort;
+    private final int serverPort;
 
-    private ClientCom clientCom;
+    private final ClientCom clientCom;
             
     public SRDestinationAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;

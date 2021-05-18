@@ -16,13 +16,13 @@ public class RepositoryStub implements IRepository_DepartureAirport,
     /**
     * Repository server host name.
     */
-    private String serverHostName;
+    private final String serverHostName;
     /**
     * Repository server port.
     */
-    private int serverPort;
+    private final int serverPort;
     
-    private ClientCom clientCom;
+    private final ClientCom clientCom;
 
     public RepositoryStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
