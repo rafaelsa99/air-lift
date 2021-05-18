@@ -6,6 +6,7 @@ import Common.MemException;
 import Main.Parameters;
 import Repository.IRepository_DestinationAirport;
 import Repository.RepositoryStub;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +18,10 @@ import java.util.logging.Logger;
 public class SRDestinationAirport implements IDestinationAirport_Passenger{
 
     /**
+     * Reentrant Lock.
+     */
+    private final ReentrantLock rl;
+    /**
      * Interface of the destination airport to the reference of the repository.
      */
     private final IRepository_DestinationAirport iRepository;
@@ -27,6 +32,7 @@ public class SRDestinationAirport implements IDestinationAirport_Passenger{
      */
     public SRDestinationAirport(IRepository_DestinationAirport iRepository) {
         this.iRepository = iRepository;
+        this.rl = new ReentrantLock(true);
     }
     
     /**
@@ -35,7 +41,12 @@ public class SRDestinationAirport implements IDestinationAirport_Passenger{
      */
     @Override
     public void leaveThePlane(int passengerID) {
-        iRepository.setPassengerState(PassengerStates.ATDS, passengerID);
+        try{
+            rl.lock();
+            iRepository.setPassengerState(PassengerStates.ATDS, passengerID);
+        } finally {
+            rl.unlock();
+        }
     }
     
     public static void main(String[] args) {

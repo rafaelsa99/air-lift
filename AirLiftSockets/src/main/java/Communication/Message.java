@@ -19,6 +19,8 @@ public class Message implements Serializable{
     private int iParam1;
     private int iParam2;
 
+    public Message() {}
+    
     public Message(int messageType) {
         this.messageType = messageType;
     }
