@@ -19,7 +19,7 @@ public class DestinationAirportMain {
     public static void main(String[] args) {
         if((args.length % 2) != 0){
             System.out.println("Optional arguments: "
-                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
+                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DESTINATION_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")");
             throw new IllegalArgumentException("Invalid Arguments");
@@ -41,7 +41,7 @@ public class DestinationAirportMain {
             }
         } catch(IllegalArgumentException ex){
             System.out.println("Optional arguments: "
-                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DEPARTURE_AIRPORT_SERVER_PORT + ")"
+                    + "\n\t-sp <SERVER_PROXY_PORT>: Server Proxy Agent Port (Default = " + Parameters.DESTINATION_AIRPORT_SERVER_PORT + ")"
                     + "\n\t-rh <REPOSITORY_SERVER_HOSTNAME>: General Repository Server Hostname(Default = " + Parameters.SERVER_HOSTNAME + ")"
                     + "\n\t-rp <REPOSITORY_SERVER_PORT>: General Repository Server Port (Default = " + Parameters.REPOSITORY_SERVER_PORT + ")");
             throw new IllegalArgumentException("Invalid Arguments");

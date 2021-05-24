@@ -133,20 +133,19 @@ public class Repository implements IRepository_DepartureAirport,
     @Override
     public void printSumUp(){
         try {
-            try (writer) {
-                rl.lock();
-                line = "";
-                int count = 0;
-                line += "\nAirlift sum up:";
-                while(!flights.empty()){
-                    try{ 
-                        line += "\nFlight " + (++count) +
-                                " transported " + flights.read() + " passengers";
-                    } catch(MemException ex) {}
-                }
-                line += ".";
-                writer.write(line);
+            rl.lock();
+            line = "";
+            int count = 0;
+            line += "\nAirlift sum up:";
+            while(!flights.empty()){
+                try{ 
+                    line += "\nFlight " + (++count) +
+                            " transported " + flights.read() + " passengers";
+                } catch(MemException ex) {}
             }
+            line += ".";
+            writer.write(line);
+
         } catch (IOException ex) {}
         finally {
             rl.unlock();
