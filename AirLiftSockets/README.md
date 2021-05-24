@@ -22,7 +22,8 @@ Optional Arguments:
 - -dsh <DESTINATION_AIRPORT_SERVER_HOSTNAME>: Shared Region Destination Airport Server Hostname (Default = "localhost")
 - -dsp <DESTINATION_AIRPORT_SERVER_PORT>: Shared Region Destination Airport Server Port (Default = 9002)
 
-#### Example
+#### Run with shell scripts (local and remote)
+Example with local build:
 ```
-//TODO Shell Script
+Scripts/localBuildAndDeploy.sh 
 ```
