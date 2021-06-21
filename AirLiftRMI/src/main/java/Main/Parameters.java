@@ -28,6 +28,12 @@ public class Parameters {
      */
     public static final int MAX_SLEEP = 1000;
       
+    
+    public static final String serverHostname = "localhost";
+             
+    public static final int severPort = 9000;
+    
+    public final static String registryEntryName = "registry";
     /**
      * It can not be instantiated.
      */

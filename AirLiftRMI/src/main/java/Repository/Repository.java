@@ -133,7 +133,7 @@ public class Repository implements IRepository_DepartureAirport,
     @Override
     public void printSumUp(){
         try {
-            try (writer) {
+            
                 rl.lock();
                 line = "";
                 int count = 0;
@@ -146,7 +146,7 @@ public class Repository implements IRepository_DepartureAirport,
                 }
                 line += ".";
                 writer.write(line);
-            }
+            
         } catch (IOException ex) {}
         finally {
             rl.unlock();
