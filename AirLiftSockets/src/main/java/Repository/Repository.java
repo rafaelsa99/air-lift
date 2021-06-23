@@ -145,7 +145,8 @@ public class Repository implements IRepository_DepartureAirport,
             }
             line += ".";
             writer.write(line);
-
+            writer.flush();
+            writer.close();
         } catch (IOException ex) {}
         finally {
             rl.unlock();

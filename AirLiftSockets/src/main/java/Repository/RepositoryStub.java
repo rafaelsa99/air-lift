@@ -21,10 +21,6 @@ public class RepositoryStub implements IRepository_DepartureAirport,
     * Repository server port.
     */
     private final int serverPort;
-    /**
-     * Client communications manager.
-     */
-    private final ClientCom clientCom;
     
     /**
      * Stub of the shared region of the general repository instantiation.
@@ -34,7 +30,6 @@ public class RepositoryStub implements IRepository_DepartureAirport,
     public RepositoryStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
-        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     /**
      * Sets the pilot state.
@@ -120,6 +115,7 @@ public class RepositoryStub implements IRepository_DepartureAirport,
      * @return the message replied by the shared region
      */
     private Message sendMessageAndWaitForReply(Message outMessage){
+        ClientCom clientCom = new ClientCom(serverHostName, serverPort);
         clientCom.open();
         clientCom.writeObject(outMessage);
         Message inMessage = (Message) clientCom.readObject();

@@ -20,10 +20,6 @@ public class SRPlaneStub implements IPlane_Pilot,
     * Plane server port.
     */
     private final int serverPort;
-    /**
-     * Client communications manager.
-     */
-    private final ClientCom clientCom;
 
     /**
      * Stub of the shared region of the plane instantiation.
@@ -33,7 +29,6 @@ public class SRPlaneStub implements IPlane_Pilot,
     public SRPlaneStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
-        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     
     /**
@@ -165,6 +160,7 @@ public class SRPlaneStub implements IPlane_Pilot,
      * @return the message replied by the shared region
      */
     private Message sendMessageAndWaitForReply(Message outMessage){
+        ClientCom clientCom = new ClientCom(serverHostName, serverPort);
         clientCom.open();
         clientCom.writeObject(outMessage);
         Message inMessage = (Message) clientCom.readObject();

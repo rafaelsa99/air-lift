@@ -18,11 +18,7 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     * Destination Airport server port.
     */
     private final int serverPort;
-    /**
-     * Client communications manager.
-     */
-    private final ClientCom clientCom;
-        
+
     /**
      * Stub of the shared region of the destination airport instantiation.
      * @param serverHostName destination airport server host name
@@ -31,7 +27,6 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
     public SRDestinationAirportStub(String serverHostName, int serverPort) {
         this.serverHostName = serverHostName;
         this.serverPort = serverPort;
-        this.clientCom = new ClientCom(serverHostName, serverPort);
     }
     
     /**
@@ -66,6 +61,7 @@ public class SRDestinationAirportStub implements IDestinationAirport_Passenger{
      * @return the message replied by the shared region
      */
     private Message sendMessageAndWaitForReply(Message outMessage){
+        ClientCom clientCom = new ClientCom(serverHostName, serverPort);
         clientCom.open();
         clientCom.writeObject(outMessage);
         Message inMessage = (Message) clientCom.readObject();

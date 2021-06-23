@@ -73,17 +73,14 @@ public class PassengerMain {
                     + "\n\t-s <MAX_SLEEP>: Maximum sleeping time in milliseconds (Default = " + Parameters.MAX_SLEEP + ")");
             throw new IllegalArgumentException("Invalid Arguments");
         }
-        SRDepartureAirportStub[] srDepartureAirportStub = new SRDepartureAirportStub[numPassengers];
-        SRDestinationAirportStub[] srDestinationAirportStub = new SRDestinationAirportStub[numPassengers];
-        SRPlaneStub[] srPlaneStub = new SRPlaneStub[numPassengers];
+        SRDepartureAirportStub srDepartureAirportStub = new SRDepartureAirportStub(depAirHostname, depAirPort);
+        SRDestinationAirportStub srDestinationAirportStub = new SRDestinationAirportStub(destAirHostname, destAirPort);
+        SRPlaneStub srPlaneStub = new SRPlaneStub(planeHostname, planePort);
         AEPassenger[] aePassenger = new AEPassenger[numPassengers];
         for (int i = 0; i < numPassengers; i++) {
-            srDepartureAirportStub[i] = new SRDepartureAirportStub(depAirHostname, depAirPort);
-            srDestinationAirportStub[i] = new SRDestinationAirportStub(destAirHostname, destAirPort);
-            srPlaneStub[i] = new SRPlaneStub(planeHostname, planePort);
-            aePassenger[i] = new AEPassenger((IDepartureAirport_Passenger)srDepartureAirportStub[i],
-                                             (IDestinationAirport_Passenger)srDestinationAirportStub[i],
-                                             (IPlane_Passenger)srPlaneStub[i], i, maxSleep);
+            aePassenger[i] = new AEPassenger((IDepartureAirport_Passenger)srDepartureAirportStub,
+                                             (IDestinationAirport_Passenger)srDestinationAirportStub,
+                                             (IPlane_Passenger)srPlaneStub, i, maxSleep);
         }
         System.out.println("Passenger threads started!");
         for (int i = 0; i < numPassengers; i++) 
@@ -94,7 +91,7 @@ public class PassengerMain {
         }catch(InterruptedException ex){
             System.out.println(ex.getMessage());
         }
-        srDestinationAirportStub[0].end();
+        srDestinationAirportStub.end();
         System.out.println("Passenger threads ended!");
     }
 }
