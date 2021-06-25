@@ -1,4 +1,3 @@
-
 package Main;
 
 import RMI.Register;
@@ -10,109 +9,109 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 /**
- *
- * @author Rafael Sá (104552), José Brás (74029)
- */
-
-/**
  * This data type instantiates and registers a remote object that enables the
  * registration of other remote objects located in the same or other processing
  * nodes in the local registry service. Communication is based in Java RMI.
+ *
+ * @author Rafael Sá (104552), José Brás (74029)
  */
 public class ServerRegisterRemoteObject {
-    public static boolean serviceEnd = false;
+
+    private static boolean serviceEnd = false;
+
     /**
-        * Main task.
-        * @param args Unused arguments
-        */
-       public static void main(String[] args) {
-            /* get location of the registry service */
-
-               String rmiRegHostName = Parameters.SERVER_HOSTNAME;
-               int rmiRegPortNumb = Parameters.REGISTRY_PORT;
-
-               /* create and install the security manager */
-
-               if (System.getSecurityManager() == null)
-                       System.setSecurityManager(new SecurityManager());
-               System.out.println("Security manager was installed!");
-
-               /* instantiate a registration remote object and generate a stub for it */
-
-               RegisterRemoteObject regEngine = new RegisterRemoteObject(rmiRegHostName, rmiRegPortNumb);
-               Register regEngineStub = null;
-               int listeningPort = Parameters.REGISTRY_PORT; /* it should be set accordingly in each case */
-
-               try {
-                       regEngineStub = (Register) UnicastRemoteObject.exportObject(regEngine, listeningPort);
-               } catch (RemoteException e) {
-                       System.out.println("RegisterRemoteObject stub generation exception: " + e.getMessage());
-                       System.exit(1);
-               }
-               System.out.println("Stub was generated!");
-
-               /* register it with the local registry service */
-
-               String nameEntry = Parameters.REGISTRY_ENTRY_NAME;
-               Registry registry = null;
-
-               try {
-                       registry = LocateRegistry.getRegistry(rmiRegHostName, rmiRegPortNumb);
-               } catch (RemoteException e) {
-                       System.out.println("RMI registry creation exception: " + e.getMessage());
-                       System.exit(1);
-               }
-               System.out.println("RMI registry was created!");
-
-               try {
-                       registry.rebind(nameEntry, regEngineStub);
-               } catch (RemoteException e) {
-                       e.printStackTrace();
-                       System.out.println("RegisterRemoteObject remote exception on registration: " + e.getMessage());
-                       System.exit(1);
-               }
-               System.out.println("RegisterRemoteObject object was registered!");
-
-               /* Wait for registry engine */
-               while (!serviceEnd) {
-                       try {
-                               synchronized(regEngine) {
-                                       regEngine.wait();
+     * Main method.
+     * @param args program arguments
+     */ 
+    public static void main(String[] args) {
+        if((args.length % 2) != 0){
+            System.out.println("Optional arguments: "
+                    + "\n\t-lp <PORT>: Port number for listening to service requests (Default = " + Parameters.REGISTRY_PORT + ")"
+                    + "\n\t-rh <REGISTRY_HOSTNAME>: Name of the platform where is located the RMI registering service (Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-rp <REGISTRY_PORT>: Port number where the registering service is listening to service requests (Default = " + Parameters.REGISTRY_PORT + ")");
+            throw new IllegalArgumentException("Invalid Arguments");
+        }
+        int port = Parameters.REGISTRY_PORT; 
+        String registryHostname = Parameters.SERVER_HOSTNAME;
+        int registryPort = Parameters.REGISTRY_PORT; 
+        try{
+            for (int i = 0; i < args.length; i+=2) {
+                switch(args[i].toLowerCase()){
+                    case "-lp": port = Integer.valueOf(args[i+1]);
+                               if ((port < 4000) || (port >= 65536)){
+                                   port = Parameters.REGISTRY_PORT; 
+                                   System.out.println("Argument " + args[i] + " is invalid. Default value will be used.");
                                }
-                       } catch (InterruptedException e) {
-               System.out.println("Main thread of registry was interrupted.");
-               System.exit(1);
-           }
-               }
+                               break;
+                    case "-rh": registryHostname = args[i+1];
+                               break;
+                    case "-rp": registryPort = Integer.valueOf(args[i+1]);
+                               if ((registryPort < 4000) || (registryPort >= 65536)){
+                                   registryPort = Parameters.REGISTRY_PORT; 
+                                   System.out.println("Argument " + args[i] + " is invalid. Default value will be used.");
+                               }
+                               break;
+                    default: throw new IllegalArgumentException();
+                }
+            }
+        } catch(IllegalArgumentException ex){
+            System.out.println("Optional arguments: "
+                    + "\n\t-lp <PORT>: Port number for listening to service requests (Default = " + Parameters.REGISTRY_PORT + ")"
+                    + "\n\t-rh <REGISTRY_HOSTNAME>: Name of the platform where is located the RMI registering service (Default = " + Parameters.SERVER_HOSTNAME + ")"
+                    + "\n\t-rp <REGISTRY_PORT>: Port number where the registering service is listening to service requests (Default = " + Parameters.REGISTRY_PORT + ")");
+            throw new IllegalArgumentException("Invalid Arguments");
+        }
+        /* create and install the security manager */
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        System.out.println("Security manager was installed!");
+        
+        RegisterRemoteObject regEngine;
+        Register regEngineStub;
+        Registry registry;
+        try{
+             /* instantiate a registration remote object and generate a stub for it */
+            regEngine = new RegisterRemoteObject(registryHostname, registryPort);
+            regEngineStub = (Register) UnicastRemoteObject.exportObject(regEngine, port);
+            System.out.println("Stub was generated!");
+            registry = LocateRegistry.getRegistry(registryHostname, registryPort);
+            System.out.println("RMI registry was created!");
+            registry.rebind(Parameters.REGISTRY_ENTRY_NAME, regEngineStub);
+            System.out.println("RegisterRemoteObject object was registered!");
+            /* wait for the end of operations */
+            while(!serviceEnd){
+                synchronized(Class.forName("Main.ServerRegisterRemoteObject")){
+                    try {
+                        Class.forName("Main.ServerRegisterRemoteObject").wait();
+                    } catch(InterruptedException e){
+                        System.out.println("Registry main thread was interrupted!");
+                    }
+                }
+            }
+            /* Register Remote Object shutdown */
+            boolean shutdownDone;
+            regEngineStub.unbind(Parameters.REGISTRY_ENTRY_NAME);
+            System.out.println("RegisterRemoteObject was deregistered!");
+            shutdownDone = UnicastRemoteObject.unexportObject (regEngine, true);
+            if (shutdownDone)
+                System.out.println("RegisterRemoteObject was shutdown!");
+        } catch (RemoteException | NotBoundException | ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 
-               System.out.println("Registry finished execution.");
-
-               /* Unregister register */
-               try {
-                       registry.unbind(nameEntry);
-               }
-       catch (RemoteException e) { 
-                       System.out.println("RegisterRemoteObject unregistration exception: " + e.getMessage ());
-                       e.printStackTrace ();
-                       System.exit (1);
-       } catch (NotBoundException e) {
-                       System.out.println("RegisterRemoteObject unregistration exception: " + e.getMessage ());
-                       e.printStackTrace ();
-                       System.exit (1);
-               }
-
-               /* Unexport register */
-
-       try {
-                       UnicastRemoteObject.unexportObject (regEngine, false);
-       } catch (RemoteException e) { 
-                       System.out.println("RegisterRemoteObject unexport exception: " + e.getMessage ());
-                       e.printStackTrace ();
-                       System.exit (1);
-       }
-
-       System.out.println("RegisterRemoteObject object was unexported successfully!");
-
-       }
-
+    /**
+     * Close of operations.
+     */
+    public static void shutdown() {
+        serviceEnd = true;
+        try {
+            synchronized (Class.forName("Main.ServerRegisterRemoteObject")) {
+                Class.forName("Main.ServerRegisterRemoteObject").notify();
+            }
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

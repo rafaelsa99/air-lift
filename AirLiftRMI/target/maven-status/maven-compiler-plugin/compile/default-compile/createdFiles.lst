@@ -1,7 +1,6 @@
 Common\MemObject.class
 Main\DepartureAirportMain.class
 Repository\IRepository.class
-Main\AirLift.class
 Repository\Repository.class
 Main\ServerRegisterRemoteObject.class
 ActiveEntity\HostessStates.class
