@@ -1,11 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package RMI;
 
-import Main.Parameters;
+package Main;
+
+import RMI.Register;
+import RMI.RegisterRemoteObject;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.NotBoundException;
@@ -31,8 +28,8 @@ public class ServerRegisterRemoteObject {
        public static void main(String[] args) {
             /* get location of the registry service */
 
-               String rmiRegHostName = Parameters.serverHostname;
-               int rmiRegPortNumb = Parameters.severPort;
+               String rmiRegHostName = Parameters.SERVER_HOSTNAME;
+               int rmiRegPortNumb = Parameters.REGISTRY_PORT;
 
                /* create and install the security manager */
 
@@ -44,7 +41,7 @@ public class ServerRegisterRemoteObject {
 
                RegisterRemoteObject regEngine = new RegisterRemoteObject(rmiRegHostName, rmiRegPortNumb);
                Register regEngineStub = null;
-               int listeningPort = Parameters.severPort; /* it should be set accordingly in each case */
+               int listeningPort = Parameters.REGISTRY_PORT; /* it should be set accordingly in each case */
 
                try {
                        regEngineStub = (Register) UnicastRemoteObject.exportObject(regEngine, listeningPort);
@@ -56,7 +53,7 @@ public class ServerRegisterRemoteObject {
 
                /* register it with the local registry service */
 
-               String nameEntry = Parameters.registryEntryName;
+               String nameEntry = Parameters.REGISTRY_ENTRY_NAME;
                Registry registry = null;
 
                try {

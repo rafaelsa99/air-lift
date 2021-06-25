@@ -3,6 +3,9 @@ package ActiveEntity;
 
 import DepartureAirport.IDepartureAirport_Hostess;
 import Plane.IPlane_Hostess;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hostess thread, which simulates the hostess life cycle.
@@ -37,14 +40,18 @@ public class AEHostess extends Thread{
     public void run(){
         int passengersOnFlight;
         while(true){
-            if(!iDepartureAirport.waitForNextFlight())
-                break;
-            iDepartureAirport.prepareForPassBoarding();
-            do{
-                iDepartureAirport.checkDocuments();
-                passengersOnFlight = iDepartureAirport.waitForNextPassenger();
-            }while(passengersOnFlight == -1);
-            iPlane.informPlaneReadyToTakeOff(passengersOnFlight);
+            try {
+                if(!iDepartureAirport.waitForNextFlight())
+                    break;
+                iDepartureAirport.prepareForPassBoarding();
+                do{
+                    iDepartureAirport.checkDocuments();
+                    passengersOnFlight = iDepartureAirport.waitForNextPassenger();
+                }while(passengersOnFlight == -1);
+                iPlane.informPlaneReadyToTakeOff(passengersOnFlight);
+            } catch (RemoteException ex) {
+                System.out.println(ex.toString());
+            }
         }
     }   
 }

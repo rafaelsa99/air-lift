@@ -6,7 +6,9 @@ import ActiveEntity.PassengerStates;
 import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemFIFO;
+import Main.DepartureAirportMain;
 import Repository.IRepository_DepartureAirport;
+import java.rmi.RemoteException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -136,9 +138,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * Pilot signals the Hostess to start the boarding process.
      * @return true, if there are still passengers to transport and the  simulation continues. 
      *         false, if there are no more passengers left to transport and the simulation ends.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public boolean informPlaneReadyForBoarding() {
+    public boolean informPlaneReadyForBoarding() throws RemoteException {
         try{
             rl.lock();
             if(numPassengersLeftToTransport == 0){ // Check if there are no more passengers left to transport
@@ -157,9 +160,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     /**
      * Operation to check the documents of the next passenger in queue.
      * The hostess signals the next passenger and awaits for him to show the documents.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void checkDocuments() {
+    public void checkDocuments() throws RemoteException {
         try{
             rl.lock();
             try {
@@ -182,9 +186,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * If there are no more customers in the queue and the plane is not ready to fly, the hostess waits for the next passenger.
      * @return the number of passengers on the plane.
      *         -1, if the boarding procedure is still ongoing.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public int waitForNextPassenger() {
+    public int waitForNextPassenger() throws RemoteException {
         try{
             rl.lock();
             iRepository.setHostessState(HostessStates.WTPS);
@@ -213,9 +218,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * The hostess waits for the plane to arrive so that the boarding process can begin.
      * @return true, if there are still passengers to transport and the  simulation continues. 
      *         false, if there are no more passengers left to transport and the simulation ends.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public boolean waitForNextFlight() {
+    public boolean waitForNextFlight() throws RemoteException {
         try{
             rl.lock();
             iRepository.setHostessState(HostessStates.WTFL);
@@ -235,9 +241,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
     /**
      * Operation for the Hostess to prepare for passenger boarding.
      * If there are no customers in the queue, the hostess waits for the next passenger.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void prepareForPassBoarding() {
+    public void prepareForPassBoarding() throws RemoteException {
         try{
             rl.lock();
             iRepository.setHostessState(HostessStates.WTPS);
@@ -254,9 +261,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * If the passenger is the first on the queue, signals the hostess.
      * The passenger waits to be called by the hostess.
      * @param passengerID passenger id 
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void waitInQueue(int passengerID) {
+    public void waitInQueue(int passengerID) throws RemoteException {
         try{
             rl.lock();
             iRepository.setPassengerState(PassengerStates.INQE, passengerID);
@@ -278,9 +286,10 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
      * The passenger signals the hostess to show the documents.
      * Then, waits for the hostess to check the documents.
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void showDocuments(int passengerID) {
+    public void showDocuments(int passengerID) throws RemoteException {
         try{
             rl.lock();
             documentsShown = true;
@@ -293,5 +302,14 @@ public class SRDepartureAirport implements IDepartureAirport_Hostess,
         finally{
             rl.unlock();
         }
+    }
+    
+    /**
+     * Operation server shutdown.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
+     */
+    @Override
+    public void shutdown() throws RemoteException {
+        DepartureAirportMain.shutdown();
     }
 }

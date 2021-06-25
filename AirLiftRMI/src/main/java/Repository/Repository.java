@@ -5,9 +5,11 @@ import ActiveEntity.PassengerStates;
 import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemFIFO;
+import Main.RepositoryMain;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -129,9 +131,10 @@ public class Repository implements IRepository_DepartureAirport,
     
     /**
      * Prints the final sum up with all flights that took place and the number of passenger in each one.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void printSumUp(){
+    public void printSumUp() throws RemoteException{
         try {
             rl.lock();
             line = "";
@@ -234,9 +237,10 @@ public class Repository implements IRepository_DepartureAirport,
      * Sets the pilot state.
      * Also updates the flight number depending on the new state.
      * @param stPilot new pilot state
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void setPilotState(int stPilot) {
+    public void setPilotState(int stPilot) throws RemoteException {
         try {
             rl.lock();
             pilotState = stPilot;
@@ -262,9 +266,10 @@ public class Repository implements IRepository_DepartureAirport,
     /**
      * Sets the hostess state.
      * @param stHostess new hostess state1
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void setHostessState(int stHostess) {
+    public void setHostessState(int stHostess) throws RemoteException {
         try {
             rl.lock();
             if(stHostess != hostessState){
@@ -289,9 +294,10 @@ public class Repository implements IRepository_DepartureAirport,
      * Also updates the counter of passengers in the queue according to the new state.
      * @param stHostess new hostess state
      * @param passengerID passenger id being checked
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void setHostessState(int stHostess, int passengerID) {
+    public void setHostessState(int stHostess, int passengerID) throws RemoteException {
         try {
             rl.lock();
             hostessState = stHostess;
@@ -312,9 +318,10 @@ public class Repository implements IRepository_DepartureAirport,
      * Also updates the passengers counters according to the new state.
      * @param stPassenger new passenger state
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void setPassengerState(int stPassenger, int passengerID) {
+    public void setPassengerState(int stPassenger, int passengerID) throws RemoteException {
         try {
             rl.lock();
             passangerState[passengerID] = stPassenger;
@@ -335,5 +342,14 @@ public class Repository implements IRepository_DepartureAirport,
         finally {
             rl.unlock();
         }
+    }
+
+    /**
+     * Operation server shutdown.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
+     */
+    @Override
+    public void shutdown() throws RemoteException {
+        RepositoryMain.shutdown();
     }
 }

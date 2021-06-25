@@ -3,6 +3,9 @@ package ActiveEntity;
 
 import DepartureAirport.IDepartureAirport_Pilot;
 import Plane.IPlane_Pilot;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Pilot thread, which simulates the pilot life cycle.
@@ -36,13 +39,17 @@ public class AEPilot extends Thread{
     @Override
     public void run() {   
         while(true){
-            if(!iDepartureAirport.informPlaneReadyForBoarding())
-                break;
-            iPlane.waitForAllInBoard();
-            iPlane.flyToDestinationPoint();
-            iPlane.announceArrival();
-            iPlane.flyToDeparturePoint();
-            iPlane.parkAtTransferGate();
+            try {
+                if(!iDepartureAirport.informPlaneReadyForBoarding())
+                    break;
+                iPlane.waitForAllInBoard();
+                iPlane.flyToDestinationPoint();
+                iPlane.announceArrival();
+                iPlane.flyToDeparturePoint();
+                iPlane.parkAtTransferGate();
+            } catch (RemoteException ex) {
+                System.out.println(ex.toString());
+            }
         }
     }
 }

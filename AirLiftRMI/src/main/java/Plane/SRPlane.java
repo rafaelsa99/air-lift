@@ -6,7 +6,9 @@ import ActiveEntity.PassengerStates;
 import ActiveEntity.PilotStates;
 import Common.MemException;
 import Common.MemList;
+import Main.PlaneMain;
 import Repository.IRepository_Plane;
+import java.rmi.RemoteException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -97,9 +99,10 @@ public class SRPlane implements IPlane_Pilot,
     /**
      * Operation for the pilot to wait for the boarding process to end.
      * The pilot waits for the signal of the hostess indicating that the plane is ready to take off.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void waitForAllInBoard() {
+    public void waitForAllInBoard() throws RemoteException{
         try{
             rl.lock();
             iRepository.setPilotState(PilotStates.WTFB);
@@ -115,9 +118,10 @@ public class SRPlane implements IPlane_Pilot,
     /**
      * Operation for the pilot to fly the plane to the Destination Point.
      * The thread sleeps for a random period of time, for a maximum o maxSleep time.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void flyToDestinationPoint() {
+    public void flyToDestinationPoint() throws RemoteException{
         iRepository.setPilotState(PilotStates.FLFW);
         try {
             Thread.sleep((long)(Math.random() * maxSleep));
@@ -127,9 +131,10 @@ public class SRPlane implements IPlane_Pilot,
     /**
      * Operation for the pilot to announce that the plane has arrived to the destination airport.
      * The pilot signals all passengers to leave the plane, and waits for the last passenger to leave.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void announceArrival() {
+    public void announceArrival() throws RemoteException{
         try{
             rl.lock();
             iRepository.setPilotState(PilotStates.DRPP);
@@ -148,9 +153,10 @@ public class SRPlane implements IPlane_Pilot,
     /**
      * Operation for the pilot to fly the plane to the Departure Point.
      * The thread sleeps for a random period of time, for a maximum o maxSleep time.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void flyToDeparturePoint() {
+    public void flyToDeparturePoint() throws RemoteException{
         iRepository.setPilotState(PilotStates.FLBK);
         try {
             Thread.sleep((long)(Math.random() * maxSleep));
@@ -159,9 +165,10 @@ public class SRPlane implements IPlane_Pilot,
 
     /**
      * Operation for the pilot to park the plane at the transfer gate.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void parkAtTransferGate() {
+    public void parkAtTransferGate() throws RemoteException{
         iRepository.setPilotState(PilotStates.ATRG);
     }
 
@@ -169,9 +176,10 @@ public class SRPlane implements IPlane_Pilot,
      * Operation for the hostess to inform that the plane is ready to take off.
      * The hostess signals the pilot to start the flight.
      * @param numPassengersOnPlane number of passengers that must be on plane before allow the take off
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void informPlaneReadyToTakeOff(int numPassengersOnPlane) {
+    public void informPlaneReadyToTakeOff(int numPassengersOnPlane) throws RemoteException {
         try{
             rl.lock();
             while(passengersOnPlane.getCount() < numPassengersOnPlane)
@@ -189,9 +197,10 @@ public class SRPlane implements IPlane_Pilot,
      * Operation for the passengers to board the plane.
      * The passenger is added to the list of passengers on the plane.
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void boardThePlane(int passengerID) {
+    public void boardThePlane(int passengerID) throws RemoteException{
         try{
             rl.lock();
             iRepository.setPassengerState(PassengerStates.INFL, passengerID);
@@ -207,9 +216,10 @@ public class SRPlane implements IPlane_Pilot,
      * Operation for the passenger to wait for the end of the flight.
      * The passenger waits to be signaled by the pilot that he can leave the plane.
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void waitForEndOfFlight(int passengerID) {
+    public void waitForEndOfFlight(int passengerID) throws RemoteException{
         try{
             rl.lock();
             while(!endOfFlight)
@@ -225,9 +235,10 @@ public class SRPlane implements IPlane_Pilot,
      * Operation for the passenger leave the plane.
      * If it is the last passenger to leave the plane, the passenger signals the pilot.
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void leaveThePlane(int passengerID) {
+    public void leaveThePlane(int passengerID) throws RemoteException{
         try{
             rl.lock();
             passengersOnPlane.read(passengerID);
@@ -237,5 +248,14 @@ public class SRPlane implements IPlane_Pilot,
         finally{
             rl.unlock();
         }
+    }
+    
+    /**
+     * Operation server shutdown.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
+     */
+    @Override
+    public void shutdown() throws RemoteException {
+        PlaneMain.shutdown();
     }
 }

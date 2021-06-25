@@ -4,6 +4,9 @@ package ActiveEntity;
 import DepartureAirport.IDepartureAirport_Passenger;
 import DestinationAirport.IDestinationAirport_Passenger;
 import Plane.IPlane_Passenger;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Passenger thread, which simulates the Passenger life cycle.
@@ -73,13 +76,17 @@ public class AEPassenger extends Thread{
      */
     @Override
     public void run(){
-        travelToAirport();
-        iDepartureAirport.waitInQueue(id);
-        iDepartureAirport.showDocuments(id);
-        iPlane.boardThePlane(id);
-        iPlane.waitForEndOfFlight(id);
-        iDestinationAirport.leaveThePlane(id);
-        iPlane.leaveThePlane(id);
+        try {
+            travelToAirport();
+            iDepartureAirport.waitInQueue(id);
+            iDepartureAirport.showDocuments(id);
+            iPlane.boardThePlane(id);
+            iPlane.waitForEndOfFlight(id);
+            iDestinationAirport.leaveThePlane(id);
+            iPlane.leaveThePlane(id);
+        } catch (RemoteException ex) {
+            System.out.println(ex.toString());
+        }
     }
     
     /**

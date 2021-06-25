@@ -2,7 +2,9 @@
 package DestinationAirport;
 
 import ActiveEntity.PassengerStates;
+import Main.DestinationAirportMain;
 import Repository.IRepository_DestinationAirport;
+import java.rmi.RemoteException;
 
 /**
  * Destination Airport.
@@ -27,10 +29,19 @@ public class SRDestinationAirport implements IDestinationAirport_Passenger{
     /**
      * Operation to indicate that the passenger left the plane and arrived at the destination airport.
      * @param passengerID passenger id
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
      */
     @Override
-    public void leaveThePlane(int passengerID) {
+    public void leaveThePlane(int passengerID) throws RemoteException{
         iRepository.setPassengerState(PassengerStates.ATDS, passengerID);
     }
     
+    /**
+     * Operation server shutdown.
+     * @throws RemoteException if either the invocation of the remote method, or the communication with the registry service fails
+     */
+    @Override
+    public void shutdown() throws RemoteException {
+        DestinationAirportMain.shutdown();
+    }
 }
