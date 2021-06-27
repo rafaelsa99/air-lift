@@ -16,7 +16,8 @@ Optional arguments:
 - -rp <REGISTRY_PORT>: Port number where the registering service is listening to service requests (Default = 9000)
 
 #### Run with shell scripts (local and remote)
-Example with local build:
+For remote run, it should be run with script name (./runRMI.sh) with 7 arguments, those being the machine ids (01 - 10) 
+Example with remote run build:
 ```
-//TODO
+./runRMI.sh 09 02 03 04 05 06 07
 ```
