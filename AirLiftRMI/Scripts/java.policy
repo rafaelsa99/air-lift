@@ -1,0 +1,6 @@
+grant
+{ permission java.util.PropertyPermission "/home/sd205/Public/classes/", "read";
+  permission java.net.SocketPermission "*:1024-65535", "listen,resolve,connect,accept";
+  permission java.net.SocketPermission "*:80", "connect";
+  permission java.io.FilePermission "/-", "read,write";
+};
