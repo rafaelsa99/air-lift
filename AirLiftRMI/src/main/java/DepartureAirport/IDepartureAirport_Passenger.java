@@ -1,14 +1,13 @@
 
 package DepartureAirport;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the passenger in the departure airport.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IDepartureAirport_Passenger extends Remote{
+public interface IDepartureAirport_Passenger extends IDepartureAirport{
     /**
      * Operation for the passenger to wait in the queue.
      * If the passenger is the first on the queue, signals the hostess.

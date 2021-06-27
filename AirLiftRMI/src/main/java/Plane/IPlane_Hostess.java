@@ -1,14 +1,13 @@
 
 package Plane;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the hostess in the plane.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IPlane_Hostess extends Remote{
+public interface IPlane_Hostess extends IPlane{
     /**
      * Operation for the hostess to inform that the plane is ready to take off.
      * The hostess signals the pilot to start the flight.

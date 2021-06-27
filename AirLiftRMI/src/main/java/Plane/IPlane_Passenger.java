@@ -1,14 +1,13 @@
 
 package Plane;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the passenger in the plane.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IPlane_Passenger extends Remote{
+public interface IPlane_Passenger extends IPlane{
     /**
      * Operation for the passengers to board the plane.
      * The passenger is added to the list of passengers on the plane.

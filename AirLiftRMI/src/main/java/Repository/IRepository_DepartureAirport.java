@@ -1,14 +1,13 @@
 
 package Repository;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the repository used on the departure airport.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IRepository_DepartureAirport extends Remote{
+public interface IRepository_DepartureAirport extends IRepository{
     /**
      * Sets the pilot state.
      * Also updates the flight number depending on the new state.

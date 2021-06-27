@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
  * Defines the methods of the repository used on the plane.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IRepository_Plane extends Remote{
+public interface IRepository_Plane extends IRepository{
     /**
      * Sets the pilot state.
      * Also updates the flight number depending on the new state.

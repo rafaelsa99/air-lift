@@ -1,14 +1,13 @@
 
 package DepartureAirport;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the pilot in the departure airport.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IDepartureAirport_Pilot extends Remote{
+public interface IDepartureAirport_Pilot extends IDepartureAirport{
     /**
      * Operation to inform that the plane is ready for boarding.
      * Pilot signals the Hostess to start the boarding process.

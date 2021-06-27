@@ -1,14 +1,13 @@
 
 package Plane;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Defines the methods of the pilot in the plane.
  * @author Rafael Sá (104552), José Brás (74029)
  */
-public interface IPlane_Pilot extends Remote{
+public interface IPlane_Pilot extends IPlane{
     /**
      * Operation for the pilot to wait for the boarding process to end.
      * The pilot waits for the signal of the hostess indicating that the plane is ready to take off.
